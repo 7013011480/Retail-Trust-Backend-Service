@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field
-from typing import Optional
+from typing import Optional, List
 from datetime import datetime
 from enum import Enum
 
@@ -41,7 +41,9 @@ class POSEvent(BaseModel):
     BillDate: str
     SessionTime: float
     ModeOfTransaction: TransactionMode
-    TransactionTotal: float = Field(default=0.0) # Added to match frontend Transaction needs
+    TransactionTotal: float = Field(default=0.0)
+    DiscountPercent: float = Field(default=0.0)
+    RefundAmount: float = Field(default=0.0)
 
 # Output Models (Matching Frontend)
 class Transaction(BaseModel):
@@ -52,7 +54,8 @@ class Transaction(BaseModel):
     cashier_name: str
     timestamp: datetime
     transaction_total: float
-    fraud_probability_score: float
+    risk_level: str = "Low" # High, Medium, Low
+    triggered_rules: List[str] = []
     status: TransactionStatus = TransactionStatus.PENDING
     fraud_category: Optional[str] = None
     notes: Optional[str] = None
@@ -67,7 +70,8 @@ class Alert(BaseModel):
     transaction_id: str
     shop_id: str
     cashier_name: str
-    fraud_probability_score: float
+    risk_level: str # High, Medium, Low
+    triggered_rules: List[str] = []
     timestamp: datetime
     status: AlertStatus = AlertStatus.NEW
 

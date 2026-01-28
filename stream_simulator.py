@@ -28,12 +28,21 @@ class StreamSimulator:
         Generates a scenario which may produce 1 or 2 events (VAS and/or POS).
         Scenarios:
         1. Genuine Transaction (Matches)
-        2. Fraud: Payment Mismatch
-        3. Fraud: Phantom Scans (VAS exists, POS missing)
+        2. High Severity:
+           - Payment Mismatch
+           - Phantom Scan (VAS exists, POS missing)
+        3. Medium Severity:
+           - High Discount (> 20%)
+           - Refund (> 0)
+           - Bill Not Generated (ReceiptGenerationStatus=False)
         """
         scenario_type = random.choices(
-            ["genuine", "payment_mismatch", "phantom_scan"],
-            weights=[0.7, 0.15, 0.15]
+            [
+                "genuine", 
+                "payment_mismatch", "phantom_scan", 
+                "high_discount", "refund", "bill_not_generated"
+            ],
+            weights=[0.6, 0.05, 0.05, 0.1, 0.1, 0.1]
         )[0]
 
         store, lane, seller_window_id = self._generate_ids()
@@ -43,7 +52,11 @@ class StreamSimulator:
         
         # Base attributes
         vas_mode = random.choice(list(TransactionMode))
+        receipt_status = True
         
+        if scenario_type == "bill_not_generated":
+            receipt_status = False
+
         vas_event = VASEvent(
             StoreId=store,
             CamId=lane["cam_id"],
@@ -53,42 +66,40 @@ class StreamSimulator:
             SessionStart=now,
             SessionEnd=now + random.uniform(30, 120),
             ModeOfTransaction=vas_mode,
-            ReceiptGenerationStatus=True
+            ReceiptGenerationStatus=receipt_status
         )
 
         pos_event = None
         
-        if scenario_type == "genuine":
-            # POS matches VAS
-            pos_event = POSEvent(
-                StoreId=store,
-                CashierName=lane["cashier"],
-                POSId=lane["pos_id"],
-                BillDate=bill_date,
-                SessionTime=now + random.uniform(1, 5), # POS usually logs slightly after
-                ModeOfTransaction=vas_mode,
-                TransactionTotal=round(random.uniform(10.0, 500.0), 2)
-            )
-            
+        # Default POS values
+        discount = 0.0
+        refund = 0.0
+        transaction_total = round(random.uniform(10.0, 500.0), 2)
+        pos_mode = vas_mode
+
+        if scenario_type == "high_discount":
+            discount = random.uniform(21.0, 50.0)
+        elif scenario_type == "refund":
+            refund = random.uniform(10.0, 100.0)
+            transaction_total = 0.0 # Or negative? Usually refunds are separate transactions but let's just flag the amount.
         elif scenario_type == "payment_mismatch":
-            # POS has different mode
             available_modes = list(TransactionMode)
-            available_modes.remove(vas_mode)
+            if vas_mode in available_modes:
+                available_modes.remove(vas_mode)
             pos_mode = random.choice(available_modes)
-            
+
+        if scenario_type != "phantom_scan":
             pos_event = POSEvent(
                 StoreId=store,
                 CashierName=lane["cashier"],
                 POSId=lane["pos_id"],
                 BillDate=bill_date,
                 SessionTime=now + random.uniform(1, 5),
-                ModeOfTransaction=pos_mode, # Mismatch
-                TransactionTotal=round(random.uniform(10.0, 500.0), 2)
+                ModeOfTransaction=pos_mode,
+                TransactionTotal=transaction_total,
+                DiscountPercent=round(discount, 2),
+                RefundAmount=round(refund, 2)
             )
-            
-        elif scenario_type == "phantom_scan":
-            # No POS event generated (Receipt generated but no POS data)
-            pos_event = None
 
         return vas_event, pos_event
 

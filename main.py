@@ -4,10 +4,12 @@ from fastapi.middleware.cors import CORSMiddleware
 from typing import List
 import uvicorn
 import json
+import redis
 
 from stream_simulator import StreamSimulator
 from fraud_engine import FraudEngine
 from models import Transaction
+from sales_poller import SalesPoller
 
 app = FastAPI(title="Retail Trust & Security Backend")
 
@@ -66,6 +68,10 @@ async def stream_consumer():
 async def startup_event():
     # Start the simulator loop in background
     asyncio.create_task(stream_consumer())
+    
+    # Start the sales polling loop in background
+    poller = SalesPoller()
+    asyncio.create_task(poller.start_polling())
 
 @app.on_event("shutdown")
 def shutdown_event():
@@ -101,6 +107,29 @@ async def validate_transaction(transaction_id: str, decision: str, notes: str = 
     await manager.broadcast(json.dumps(message))
     
     return {"status": "success"}
+    
+@app.get("/api/sales-stream")
+async def get_sales_stream(count: int = 10):
+    """
+    Fetch the latest sales data published to Redis Stream.
+    """
+    try:
+        r = redis.Redis(host='localhost', port=6379, db=0, decode_responses=True)
+        # Read last 'count' entries from the stream "sales_stream"
+        # xrevrange returns items in reverse order (newest first)
+        stream_data = r.xrevrange("sales_stream", count=count)
+        
+        results = []
+        for message_id, data in stream_data:
+            results.append({
+                "stream_id": message_id,
+                "data": data
+            })
+            
+        return {"status": "success", "count": len(results), "data": results}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 
 if __name__ == "__main__":
     uvicorn.run("main:app", host="0.0.0.0", port=8001, reload=True)

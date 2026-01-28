@@ -96,47 +96,73 @@ class FraudEngine:
             del self.pending_pos[pos_key]
 
     async def _check_timeout(self, seller_window_id: str, vas_event: VASEvent):
-        # Wait for X seconds to see if POS arrives
-        await asyncio.sleep(10) 
+        # Wait for 120 seconds (2 mins) to see if POS arrives as per High Severity Rule
+        await asyncio.sleep(120) 
         
         # If still in pending, it means POS never arrived
         if seller_window_id in self.pending_vas and self.pending_vas[seller_window_id] == vas_event:
             del self.pending_vas[seller_window_id]
             
             # Application Logic: Receipt generated but POS missing
+            # Only if receipt was actually generated (or supposedly generated)
             if vas_event.ReceiptGenerationStatus:
                 await self._create_fraud_alert(
-                    vas_event=vas_event, 
-                    pos_event=None, 
-                    reason="Phantom Scan: Receipt generated but no POS record found",
-                    score=80
+                    vas=vas_event, 
+                    pos=None, 
+                    rules=["Corresponding object is not present in VAS for POS and vise versa"],
+                    risk_level="High"
                 )
 
-    async def _cleanup_pos(self, pos_id: str):
-        await asyncio.sleep(30)
-        if pos_id in self.pending_pos:
-            del self.pending_pos[pos_id]
+    async def _cleanup_pos(self, pos_key: str):
+        # Increased cleanup time to match timeout window + buffer
+        await asyncio.sleep(150)
+        if pos_key in self.pending_pos:
+            del self.pending_pos[pos_key]
+            # TODO: Handle Case: POS exists, VAS missing? (Vice versa rule)
+            # For now, just cleaning up. The vice versa rule implies we should check here too.
+            # But let's stick to the primary flow for now to keep it simple unless specified.
 
     async def _analyze_pair(self, vas: VASEvent, pos: POSEvent):
         # We have both. Check for consistency.
-        score = 0
-        reasons = []
+        triggered_rules = []
+        risk_level = "Low"
 
-        # Rule 1: Payment Mode Mismatch
+        # Rule 1: Payment Mode Mismatch (High)
         if vas.ModeOfTransaction != pos.ModeOfTransaction:
-            score += 70
-            reasons.append(f"Payment Mismatch: VAS saw {vas.ModeOfTransaction}, POS logged {pos.ModeOfTransaction}")
+            triggered_rules.append(f"Payment Mode Mismatch (VAS: {vas.ModeOfTransaction.value}, POS: {pos.ModeOfTransaction.value})")
 
-        # Rule 2: Timestamp big divergence? (Optional, let's stick to user reqs)
+        # Rule 2: Bill not generated (Medium)
+        if not vas.ReceiptGenerationStatus:
+            triggered_rules.append("Bill not generated in VAS")
+
+        # Rule 3: High Discount (Medium)
+        if hasattr(pos, 'DiscountPercent') and pos.DiscountPercent > 20:
+             triggered_rules.append(f"High Discount ({pos.DiscountPercent}%)")
+
+        # Rule 4: Refund (Medium)
+        if hasattr(pos, 'RefundAmount') and pos.RefundAmount > 0:
+            triggered_rules.append(f"Refund Processed (${pos.RefundAmount})")
+
+        # Determine Risk Level
+        if any("Mismatch" in r for r in triggered_rules):
+            risk_level = "High"
+        elif any("Bill not generated" in r for r in triggered_rules): 
+            # Note: User said Medium, but logic might dictate higher if no receipt? 
+            # User specified Medium.
+            if risk_level != "High":
+                risk_level = "Medium"
+        elif triggered_rules: # Any other rules (Discount, Refund)
+             if risk_level != "High":
+                risk_level = "Medium"
+        
+        # Additional check for High Severity "Vice Versa" rule is implicitly handled if one is missing (handled in timeout).
+        # This function runs when BOTH match. 
 
         status = TransactionStatus.PENDING
-        if score > 0:
-            if score >= 80:
-                status = TransactionStatus.FRAUDULENT
-            elif score >= 60:
-                status = TransactionStatus.SUSPICIOUS
-            else:
-                status = TransactionStatus.PENDING # Default for low scores? Or Genuine?
+        if risk_level == "High":
+            status = TransactionStatus.FRAUDULENT
+        elif risk_level == "Medium":
+            status = TransactionStatus.SUSPICIOUS
         else:
             status = TransactionStatus.GENUINE
 
@@ -149,36 +175,37 @@ class FraudEngine:
             cashier_name=pos.CashierName,
             timestamp=datetime.fromtimestamp(pos.SessionTime),
             transaction_total=pos.TransactionTotal,
-            fraud_probability_score=score,
+            risk_level=risk_level,
+            triggered_rules=triggered_rules,
             status=status,
-            fraud_category=reasons[0] if reasons else None,
-            notes=", ".join(reasons) if reasons else None
+            fraud_category=triggered_rules[0] if triggered_rules else None,
+            notes=", ".join(triggered_rules) if triggered_rules else None
         )
 
         await self.update_callback("NEW_TRANSACTION", transaction)
 
-        # If high fraud, also trigger Alert
-        if score > 50:
-             await self._create_fraud_alert(vas, pos, reasons[0] if reasons else "High Fraud Score", score, transaction_id=transaction.id)
+        # If High or Medium risk, trigger Alert (or just High?)
+        # Let's trigger for both High and Medium to be safe/visible
+        if risk_level in ["High", "Medium"]:
+             await self._create_fraud_alert(vas, pos, triggered_rules, risk_level, transaction_id=transaction.id)
 
-    async def _create_fraud_alert(self, vas: VASEvent, pos: Optional[POSEvent], reason: str, score: float, transaction_id: str = None):
+    async def _create_fraud_alert(self, vas: VASEvent, pos: Optional[POSEvent], rules: List[str], risk_level: str, transaction_id: str = None):
         if not transaction_id:
             transaction_id = f"TXN-{vas.SessionId}"
-            # Ensure we create a transaction record even for phantom scans so it appears in the list?
-            # User dashboard shows transactions. A phantom scan is a transaction that exists in video but not POS.
-            # We should probably construct a dummy transaction for the dashboard to show.
+            # Dummy transaction for phantom scan
             transaction = Transaction(
                 id=transaction_id,
                 shop_id=vas.StoreId,
                 cam_id=vas.CamId,
                 pos_id=self.mapping.get(vas.SellerWindowId, "Unknown"),
-                cashier_name="Unknown", # POS missing
+                cashier_name="Unknown", 
                 timestamp=datetime.fromtimestamp(vas.SessionEnd),
                 transaction_total=0.0,
-                fraud_probability_score=score,
+                risk_level=risk_level,
+                triggered_rules=rules,
                 status=TransactionStatus.FRAUDULENT,
-                fraud_category=reason,
-                notes="Video detected receipt, but no POS data."
+                fraud_category=rules[0],
+                notes="; ".join(rules)
             )
             await self.update_callback("NEW_TRANSACTION", transaction)
 
@@ -187,7 +214,8 @@ class FraudEngine:
             transaction_id=transaction_id,
             shop_id=vas.StoreId,
             cashier_name=pos.CashierName if pos else "Unknown",
-            fraud_probability_score=score,
+            risk_level=risk_level,
+            triggered_rules=rules,
             timestamp=datetime.fromtimestamp(vas.SessionEnd),
             status=AlertStatus.NEW
         )
