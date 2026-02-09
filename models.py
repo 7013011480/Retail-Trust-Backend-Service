@@ -7,6 +7,7 @@ class TransactionMode(str, Enum):
     CASH = "Cash"
     CARD = "Card"
     UPI = "UPI"
+    PHONEPE = "Phonepe"
 
 class TransactionStatus(str, Enum):
     GENUINE = "genuine"
@@ -40,10 +41,14 @@ class POSEvent(BaseModel):
     POSId: str
     BillDate: str
     SessionTime: float
-    ModeOfTransaction: TransactionMode
+    ModeOfTransaction: str # Changed from enum to str to be more flexible with "Phonepe" etc.
     TransactionTotal: float = Field(default=0.0)
     DiscountPercent: float = Field(default=0.0)
     RefundAmount: float = Field(default=0.0)
+    
+    # Allow extra fields from JSON
+    class Config:
+        extra = "ignore"
 
 # Output Models (Matching Frontend)
 class Transaction(BaseModel):

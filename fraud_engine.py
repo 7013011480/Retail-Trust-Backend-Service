@@ -9,12 +9,12 @@ class FraudEngine:
         # Mapping SellerWindowId -> POSId
         # In a real app this would be in a DB
         self.mapping = {}
-        stores = ["STR001", "STR002", "STR003"]
+        stores = ["STR001", "STR002", "STR003", "NSCIN8227"]
         lanes = [
             {"cam_id": "CAM-01", "window_id": "W1", "pos_id": "POS-01"},
             {"cam_id": "CAM-01", "window_id": "W2", "pos_id": "POS-02"},
             {"cam_id": "CAM-02", "window_id": "W1", "pos_id": "POS-03"},
-            {"cam_id": "CAM-02", "window_id": "W2", "pos_id": "POS-04"},
+            {"cam_id": "CAM-02", "window_id": "W2", "pos_id": "POS4"}, # Updated to match sales_data.json
         ]
         
         # Consistent mapping generation matching StreamSimulator
@@ -221,4 +221,86 @@ class FraudEngine:
         )
         await self.update_callback("NEW_ALERT", alert)
         
+    async def process_vas_with_lookup(self, vas_event: VASEvent, pos_list: List[dict]) -> Optional[dict]:
+        """
+        Process VAS event and look for its pair in the provided POS list.
+        Returns the matched POS event dict if found, None otherwise.
+        """
+        seller_window_id = vas_event.SellerWindowId
+        expected_pos_id = self.mapping.get(seller_window_id)
+        
+        if not expected_pos_id:
+            # print(f"Unknown mapping for {seller_window_id}")
+            # Still process if we want to handle unknown mappings, but for now return None.
+            pass
+
+        # Search in pos_list
+        matched_pos_data = None
+        for pos_data in pos_list:
+            # Check for generic match or specific Store/POS match
+            # pos_data keys might be CamelCase if loaded via SalesPoller logic above, or raw?
+            # SalesPoller creates dict with StoreId, POSId etc.
+            p_store = pos_data.get("StoreId")
+            p_id = pos_data.get("POSId")
+            
+            # Simple match condition: Store and POS ID match
+            # And maybe time window? (Within X minutes)
+            # For now strict ID match + Time check (e.g. +/- 5 mins)
+            if p_store == vas_event.StoreId and p_id == expected_pos_id:
+                # Check time
+                p_time = pos_data.get("SessionTime", 0)
+                v_time = vas_event.SessionEnd
+                if abs(p_time - v_time) < 300: # 5 mins tolerance
+                    matched_pos_data = pos_data
+                    break
+        
+        if matched_pos_data:
+            # Convert dict to POSEvent
+            pos_event = POSEvent(**matched_pos_data)
+            await self._analyze_pair(vas_event, pos_event)
+            return matched_pos_data
+        else:
+            # Store in pending
+            self.pending_vas[seller_window_id] = vas_event
+            # Start timeout check (if we want to clean up eventually)
+            asyncio.create_task(self._check_timeout(seller_window_id, vas_event))
+            return None
+
+    async def match_pending_vas(self, pos_list: List[dict]) -> List[dict]:
+        """
+        Checks pending VAS events against the current POS list.
+        Returns list of matched POS events to be removed from the file.
+        """
+        matched_to_remove = []
+        
+        # Iterate over a copy of keys since we might modify pending_vas
+        for seller_window_id, vas_event in list(self.pending_vas.items()):
+             expected_pos_id = self.mapping.get(seller_window_id)
+             if not expected_pos_id:
+                 continue
+                 
+             for pos_data in pos_list:
+                if pos_data in matched_to_remove:
+                    continue
+                    
+                p_store = pos_data.get("StoreId")
+                p_id = pos_data.get("POSId")
+                
+                if p_store == vas_event.StoreId and p_id == expected_pos_id:
+                    p_time = pos_data.get("SessionTime", 0)
+                    v_time = vas_event.SessionEnd
+                    if abs(p_time - v_time) < 300:
+                        # Match found!
+                        pos_event = POSEvent(**pos_data)
+                        await self._analyze_pair(vas_event, pos_event)
+                        
+                        # Remove from pending
+                        if seller_window_id in self.pending_vas:
+                            del self.pending_vas[seller_window_id]
+                        
+                        matched_to_remove.append(pos_data)
+                        break
+        
+        return matched_to_remove
+
 import uuid
