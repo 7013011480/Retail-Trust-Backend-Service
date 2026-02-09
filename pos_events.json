@@ -1,0 +1,1402 @@
+[
+  {
+    "stream_id": "1770625720447-0",
+    "data": {
+      "StoreId": "STR003",
+      "CashierName": "James Williams",
+      "POSId": "POS-04",
+      "BillDate": "2026-02-09",
+      "SessionTime": 1770625723.9730039,
+      "ModeOfTransaction": "Card",
+      "TransactionTotal": 425.55,
+      "DiscountPercent": 0.0,
+      "RefundAmount": 0.0
+    }
+  },
+  {
+    "stream_id": "1770625725326-0",
+    "data": {
+      "StoreId": "STR001",
+      "CashierName": "Sarah Johnson",
+      "POSId": "POS-01",
+      "BillDate": "2026-02-09",
+      "SessionTime": 1770625728.673585,
+      "ModeOfTransaction": "Card",
+      "TransactionTotal": 172.18,
+      "DiscountPercent": 0.0,
+      "RefundAmount": 0.0
+    }
+  },
+  {
+    "stream_id": "1770625730268-0",
+    "data": {
+      "StoreId": "STR001",
+      "CashierName": "James Williams",
+      "POSId": "POS-04",
+      "BillDate": "2026-02-09",
+      "SessionTime": 1770625734.8283658,
+      "ModeOfTransaction": "Cash",
+      "TransactionTotal": 242.82,
+      "DiscountPercent": 0.0,
+      "RefundAmount": 0.0
+    }
+  },
+  {
+    "stream_id": "1770625734503-0",
+    "data": {
+      "StoreId": "STR002",
+      "CashierName": "James Williams",
+      "POSId": "POS-04",
+      "BillDate": "2026-02-09",
+      "SessionTime": 1770625738.1997051,
+      "ModeOfTransaction": "UPI",
+      "TransactionTotal": 452.71,
+      "DiscountPercent": 0.0,
+      "RefundAmount": 0.0
+    }
+  },
+  {
+    "stream_id": "1770625739398-0",
+    "data": {
+      "StoreId": "STR003",
+      "CashierName": "Michael Chen",
+      "POSId": "POS-02",
+      "BillDate": "2026-02-09",
+      "SessionTime": 1770625742.7935941,
+      "ModeOfTransaction": "Cash",
+      "TransactionTotal": 0.0,
+      "DiscountPercent": 0.0,
+      "RefundAmount": 42.81
+    }
+  },
+  {
+    "stream_id": "1770625743724-0",
+    "data": {
+      "StoreId": "STR001",
+      "CashierName": "James Williams",
+      "POSId": "POS-04",
+      "BillDate": "2026-02-09",
+      "SessionTime": 1770625748.0144098,
+      "ModeOfTransaction": "UPI",
+      "TransactionTotal": 57.73,
+      "DiscountPercent": 0.0,
+      "RefundAmount": 0.0
+    }
+  },
+  {
+    "stream_id": "1770625748688-0",
+    "data": {
+      "StoreId": "STR001",
+      "CashierName": "Michael Chen",
+      "POSId": "POS-02",
+      "BillDate": "2026-02-09",
+      "SessionTime": 1770625749.574308,
+      "ModeOfTransaction": "UPI",
+      "TransactionTotal": 198.6,
+      "DiscountPercent": 45.46,
+      "RefundAmount": 0.0
+    }
+  },
+  {
+    "stream_id": "1770625752428-0",
+    "data": {
+      "StoreId": "STR003",
+      "CashierName": "Michael Chen",
+      "POSId": "POS-02",
+      "BillDate": "2026-02-09",
+      "SessionTime": 1770625756.0916822,
+      "ModeOfTransaction": "Card",
+      "TransactionTotal": 442.29,
+      "DiscountPercent": 0.0,
+      "RefundAmount": 0.0
+    }
+  },
+  {
+    "stream_id": "1770625755786-0",
+    "data": {
+      "StoreId": "STR002",
+      "CashierName": "James Williams",
+      "POSId": "POS-04",
+      "BillDate": "2026-02-09",
+      "SessionTime": 1770625758.0935338,
+      "ModeOfTransaction": "Card",
+      "TransactionTotal": 240.75,
+      "DiscountPercent": 0.0,
+      "RefundAmount": 0.0
+    }
+  },
+  {
+    "stream_id": "1770625758335-0",
+    "data": {
+      "StoreId": "STR002",
+      "CashierName": "Michael Chen",
+      "POSId": "POS-02",
+      "BillDate": "2026-02-09",
+      "SessionTime": 1770625762.9242992,
+      "ModeOfTransaction": "UPI",
+      "TransactionTotal": 426.49,
+      "DiscountPercent": 0.0,
+      "RefundAmount": 0.0
+    }
+  },
+  {
+    "stream_id": "1770625763751-0",
+    "data": {
+      "StoreId": "STR002",
+      "CashierName": "James Williams",
+      "POSId": "POS-04",
+      "BillDate": "2026-02-09",
+      "SessionTime": 1770625766.301006,
+      "ModeOfTransaction": "Cash",
+      "TransactionTotal": 60.54,
+      "DiscountPercent": 0.0,
+      "RefundAmount": 0.0
+    }
+  },
+  {
+    "stream_id": "1770625767346-0",
+    "data": {
+      "StoreId": "STR002",
+      "CashierName": "Sarah Johnson",
+      "POSId": "POS-01",
+      "BillDate": "2026-02-09",
+      "SessionTime": 1770625769.2447166,
+      "ModeOfTransaction": "UPI",
+      "TransactionTotal": 167.98,
+      "DiscountPercent": 0.0,
+      "RefundAmount": 0.0
+    }
+  },
+  {
+    "stream_id": "1770625770749-0",
+    "data": {
+      "StoreId": "STR002",
+      "CashierName": "Sarah Johnson",
+      "POSId": "POS-01",
+      "BillDate": "2026-02-09",
+      "SessionTime": 1770625775.1811795,
+      "ModeOfTransaction": "UPI",
+      "TransactionTotal": 349.18,
+      "DiscountPercent": 45.24,
+      "RefundAmount": 0.0
+    }
+  },
+  {
+    "stream_id": "1770625774084-0",
+    "data": {
+      "StoreId": "STR001",
+      "CashierName": "Emily Rodriguez",
+      "POSId": "POS-03",
+      "BillDate": "2026-02-09",
+      "SessionTime": 1770625777.556846,
+      "ModeOfTransaction": "UPI",
+      "TransactionTotal": 335.66,
+      "DiscountPercent": 0.0,
+      "RefundAmount": 0.0
+    }
+  },
+  {
+    "stream_id": "1770625778736-0",
+    "data": {
+      "StoreId": "STR001",
+      "CashierName": "Sarah Johnson",
+      "POSId": "POS-01",
+      "BillDate": "2026-02-09",
+      "SessionTime": 1770625780.7420568,
+      "ModeOfTransaction": "Cash",
+      "TransactionTotal": 0.0,
+      "DiscountPercent": 0.0,
+      "RefundAmount": 26.03
+    }
+  },
+  {
+    "stream_id": "1770625783383-0",
+    "data": {
+      "StoreId": "STR002",
+      "CashierName": "James Williams",
+      "POSId": "POS-04",
+      "BillDate": "2026-02-09",
+      "SessionTime": 1770625785.7505684,
+      "ModeOfTransaction": "Card",
+      "TransactionTotal": 60.4,
+      "DiscountPercent": 0.0,
+      "RefundAmount": 0.0
+    }
+  },
+  {
+    "stream_id": "1770625792479-0",
+    "data": {
+      "StoreId": "STR002",
+      "CashierName": "Sarah Johnson",
+      "POSId": "POS-01",
+      "BillDate": "2026-02-09",
+      "SessionTime": 1770625793.6603734,
+      "ModeOfTransaction": "Card",
+      "TransactionTotal": 0.0,
+      "DiscountPercent": 0.0,
+      "RefundAmount": 66.83
+    }
+  },
+  {
+    "stream_id": "1770625795132-0",
+    "data": {
+      "StoreId": "STR002",
+      "CashierName": "Michael Chen",
+      "POSId": "POS-02",
+      "BillDate": "2026-02-09",
+      "SessionTime": 1770625799.0476327,
+      "ModeOfTransaction": "Cash",
+      "TransactionTotal": 174.28,
+      "DiscountPercent": 0.0,
+      "RefundAmount": 0.0
+    }
+  },
+  {
+    "stream_id": "1770625804116-0",
+    "data": {
+      "StoreId": "STR001",
+      "CashierName": "James Williams",
+      "POSId": "POS-04",
+      "BillDate": "2026-02-09",
+      "SessionTime": 1770625805.5847208,
+      "ModeOfTransaction": "Cash",
+      "TransactionTotal": 240.47,
+      "DiscountPercent": 0.0,
+      "RefundAmount": 0.0
+    }
+  },
+  {
+    "stream_id": "1770625808583-0",
+    "data": {
+      "StoreId": "STR002",
+      "CashierName": "James Williams",
+      "POSId": "POS-04",
+      "BillDate": "2026-02-09",
+      "SessionTime": 1770625811.974664,
+      "ModeOfTransaction": "Card",
+      "TransactionTotal": 0.0,
+      "DiscountPercent": 0.0,
+      "RefundAmount": 40.84
+    }
+  },
+  {
+    "stream_id": "1770625812086-0",
+    "data": {
+      "StoreId": "STR002",
+      "CashierName": "Sarah Johnson",
+      "POSId": "POS-01",
+      "BillDate": "2026-02-09",
+      "SessionTime": 1770625814.0122895,
+      "ModeOfTransaction": "Cash",
+      "TransactionTotal": 0.0,
+      "DiscountPercent": 0.0,
+      "RefundAmount": 90.05
+    }
+  },
+  {
+    "stream_id": "1770625816019-0",
+    "data": {
+      "StoreId": "STR003",
+      "CashierName": "Emily Rodriguez",
+      "POSId": "POS-03",
+      "BillDate": "2026-02-09",
+      "SessionTime": 1770625820.6362267,
+      "ModeOfTransaction": "Card",
+      "TransactionTotal": 107.86,
+      "DiscountPercent": 0.0,
+      "RefundAmount": 0.0
+    }
+  },
+  {
+    "stream_id": "1770625819599-0",
+    "data": {
+      "StoreId": "STR001",
+      "CashierName": "Sarah Johnson",
+      "POSId": "POS-01",
+      "BillDate": "2026-02-09",
+      "SessionTime": 1770625824.240775,
+      "ModeOfTransaction": "UPI",
+      "TransactionTotal": 215.85,
+      "DiscountPercent": 0.0,
+      "RefundAmount": 0.0
+    }
+  },
+  {
+    "stream_id": "1770625823374-0",
+    "data": {
+      "StoreId": "STR002",
+      "CashierName": "Sarah Johnson",
+      "POSId": "POS-01",
+      "BillDate": "2026-02-09",
+      "SessionTime": 1770625827.9315493,
+      "ModeOfTransaction": "Cash",
+      "TransactionTotal": 496.73,
+      "DiscountPercent": 0.0,
+      "RefundAmount": 0.0
+    }
+  },
+  {
+    "stream_id": "1770625825597-0",
+    "data": {
+      "StoreId": "STR002",
+      "CashierName": "James Williams",
+      "POSId": "POS-04",
+      "BillDate": "2026-02-09",
+      "SessionTime": 1770625826.7113433,
+      "ModeOfTransaction": "Cash",
+      "TransactionTotal": 458.99,
+      "DiscountPercent": 0.0,
+      "RefundAmount": 0.0
+    }
+  },
+  {
+    "stream_id": "1770625828160-0",
+    "data": {
+      "StoreId": "STR003",
+      "CashierName": "Sarah Johnson",
+      "POSId": "POS-01",
+      "BillDate": "2026-02-09",
+      "SessionTime": 1770625832.8643482,
+      "ModeOfTransaction": "UPI",
+      "TransactionTotal": 53.81,
+      "DiscountPercent": 0.0,
+      "RefundAmount": 0.0
+    }
+  },
+  {
+    "stream_id": "1770625833029-0",
+    "data": {
+      "StoreId": "STR002",
+      "CashierName": "Emily Rodriguez",
+      "POSId": "POS-03",
+      "BillDate": "2026-02-09",
+      "SessionTime": 1770625836.7003205,
+      "ModeOfTransaction": "UPI",
+      "TransactionTotal": 56.68,
+      "DiscountPercent": 0.0,
+      "RefundAmount": 0.0
+    }
+  },
+  {
+    "stream_id": "1770625836114-0",
+    "data": {
+      "StoreId": "STR003",
+      "CashierName": "Emily Rodriguez",
+      "POSId": "POS-03",
+      "BillDate": "2026-02-09",
+      "SessionTime": 1770625838.394815,
+      "ModeOfTransaction": "Cash",
+      "TransactionTotal": 58.4,
+      "DiscountPercent": 0.0,
+      "RefundAmount": 0.0
+    }
+  },
+  {
+    "stream_id": "1770625840795-0",
+    "data": {
+      "StoreId": "STR003",
+      "CashierName": "Emily Rodriguez",
+      "POSId": "POS-03",
+      "BillDate": "2026-02-09",
+      "SessionTime": 1770625844.6840653,
+      "ModeOfTransaction": "Cash",
+      "TransactionTotal": 351.35,
+      "DiscountPercent": 0.0,
+      "RefundAmount": 0.0
+    }
+  },
+  {
+    "stream_id": "1770625845843-0",
+    "data": {
+      "StoreId": "STR003",
+      "CashierName": "Sarah Johnson",
+      "POSId": "POS-01",
+      "BillDate": "2026-02-09",
+      "SessionTime": 1770625847.379614,
+      "ModeOfTransaction": "Card",
+      "TransactionTotal": 101.19,
+      "DiscountPercent": 0.0,
+      "RefundAmount": 0.0
+    }
+  },
+  {
+    "stream_id": "1770625849453-0",
+    "data": {
+      "StoreId": "STR002",
+      "CashierName": "James Williams",
+      "POSId": "POS-04",
+      "BillDate": "2026-02-09",
+      "SessionTime": 1770625851.850651,
+      "ModeOfTransaction": "Cash",
+      "TransactionTotal": 0.0,
+      "DiscountPercent": 0.0,
+      "RefundAmount": 60.49
+    }
+  },
+  {
+    "stream_id": "1770625855974-0",
+    "data": {
+      "StoreId": "STR001",
+      "CashierName": "James Williams",
+      "POSId": "POS-04",
+      "BillDate": "2026-02-09",
+      "SessionTime": 1770625858.1640646,
+      "ModeOfTransaction": "Card",
+      "TransactionTotal": 180.34,
+      "DiscountPercent": 29.87,
+      "RefundAmount": 0.0
+    }
+  },
+  {
+    "stream_id": "1770625860528-0",
+    "data": {
+      "StoreId": "STR002",
+      "CashierName": "Emily Rodriguez",
+      "POSId": "POS-03",
+      "BillDate": "2026-02-09",
+      "SessionTime": 1770625862.9603245,
+      "ModeOfTransaction": "Card",
+      "TransactionTotal": 345.1,
+      "DiscountPercent": 36.7,
+      "RefundAmount": 0.0
+    }
+  },
+  {
+    "stream_id": "1770625863844-0",
+    "data": {
+      "StoreId": "STR001",
+      "CashierName": "James Williams",
+      "POSId": "POS-04",
+      "BillDate": "2026-02-09",
+      "SessionTime": 1770625868.5424025,
+      "ModeOfTransaction": "UPI",
+      "TransactionTotal": 275.71,
+      "DiscountPercent": 0.0,
+      "RefundAmount": 0.0
+    }
+  },
+  {
+    "stream_id": "1770625868635-0",
+    "data": {
+      "StoreId": "STR003",
+      "CashierName": "James Williams",
+      "POSId": "POS-04",
+      "BillDate": "2026-02-09",
+      "SessionTime": 1770625870.8432171,
+      "ModeOfTransaction": "UPI",
+      "TransactionTotal": 47.29,
+      "DiscountPercent": 0.0,
+      "RefundAmount": 0.0
+    }
+  },
+  {
+    "stream_id": "1770625873115-0",
+    "data": {
+      "StoreId": "STR002",
+      "CashierName": "Michael Chen",
+      "POSId": "POS-02",
+      "BillDate": "2026-02-09",
+      "SessionTime": 1770625875.567998,
+      "ModeOfTransaction": "Card",
+      "TransactionTotal": 299.47,
+      "DiscountPercent": 0.0,
+      "RefundAmount": 0.0
+    }
+  },
+  {
+    "stream_id": "1770625878296-0",
+    "data": {
+      "StoreId": "STR003",
+      "CashierName": "Emily Rodriguez",
+      "POSId": "POS-03",
+      "BillDate": "2026-02-09",
+      "SessionTime": 1770625880.8893225,
+      "ModeOfTransaction": "Card",
+      "TransactionTotal": 313.61,
+      "DiscountPercent": 0.0,
+      "RefundAmount": 0.0
+    }
+  },
+  {
+    "stream_id": "1770625880905-0",
+    "data": {
+      "StoreId": "STR001",
+      "CashierName": "Emily Rodriguez",
+      "POSId": "POS-03",
+      "BillDate": "2026-02-09",
+      "SessionTime": 1770625884.9688666,
+      "ModeOfTransaction": "Card",
+      "TransactionTotal": 46.61,
+      "DiscountPercent": 0.0,
+      "RefundAmount": 0.0
+    }
+  },
+  {
+    "stream_id": "1770625886192-0",
+    "data": {
+      "StoreId": "STR001",
+      "CashierName": "James Williams",
+      "POSId": "POS-04",
+      "BillDate": "2026-02-09",
+      "SessionTime": 1770625888.2549653,
+      "ModeOfTransaction": "Cash",
+      "TransactionTotal": 82.43,
+      "DiscountPercent": 0.0,
+      "RefundAmount": 0.0
+    }
+  },
+  {
+    "stream_id": "1770625889858-0",
+    "data": {
+      "StoreId": "STR002",
+      "CashierName": "Michael Chen",
+      "POSId": "POS-02",
+      "BillDate": "2026-02-09",
+      "SessionTime": 1770625890.6925828,
+      "ModeOfTransaction": "Cash",
+      "TransactionTotal": 194.29,
+      "DiscountPercent": 26.29,
+      "RefundAmount": 0.0
+    }
+  },
+  {
+    "stream_id": "1770625892797-0",
+    "data": {
+      "StoreId": "STR003",
+      "CashierName": "Emily Rodriguez",
+      "POSId": "POS-03",
+      "BillDate": "2026-02-09",
+      "SessionTime": 1770625896.406325,
+      "ModeOfTransaction": "Card",
+      "TransactionTotal": 373.69,
+      "DiscountPercent": 0.0,
+      "RefundAmount": 0.0
+    }
+  },
+  {
+    "stream_id": "1770625895580-0",
+    "data": {
+      "StoreId": "STR002",
+      "CashierName": "James Williams",
+      "POSId": "POS-04",
+      "BillDate": "2026-02-09",
+      "SessionTime": 1770625899.4502556,
+      "ModeOfTransaction": "Card",
+      "TransactionTotal": 422.56,
+      "DiscountPercent": 0.0,
+      "RefundAmount": 0.0
+    }
+  },
+  {
+    "stream_id": "1770625899247-0",
+    "data": {
+      "StoreId": "STR002",
+      "CashierName": "James Williams",
+      "POSId": "POS-04",
+      "BillDate": "2026-02-09",
+      "SessionTime": 1770625900.4296951,
+      "ModeOfTransaction": "Cash",
+      "TransactionTotal": 352.22,
+      "DiscountPercent": 29.49,
+      "RefundAmount": 0.0
+    }
+  },
+  {
+    "stream_id": "1770625903707-0",
+    "data": {
+      "StoreId": "STR003",
+      "CashierName": "Sarah Johnson",
+      "POSId": "POS-01",
+      "BillDate": "2026-02-09",
+      "SessionTime": 1770625905.499323,
+      "ModeOfTransaction": "Card",
+      "TransactionTotal": 278.23,
+      "DiscountPercent": 0.0,
+      "RefundAmount": 0.0
+    }
+  },
+  {
+    "stream_id": "1770625907195-0",
+    "data": {
+      "StoreId": "STR001",
+      "CashierName": "Sarah Johnson",
+      "POSId": "POS-01",
+      "BillDate": "2026-02-09",
+      "SessionTime": 1770625908.1736507,
+      "ModeOfTransaction": "Card",
+      "TransactionTotal": 123.97,
+      "DiscountPercent": 0.0,
+      "RefundAmount": 0.0
+    }
+  },
+  {
+    "stream_id": "1770625910318-0",
+    "data": {
+      "StoreId": "STR002",
+      "CashierName": "Michael Chen",
+      "POSId": "POS-02",
+      "BillDate": "2026-02-09",
+      "SessionTime": 1770625912.48314,
+      "ModeOfTransaction": "Cash",
+      "TransactionTotal": 265.93,
+      "DiscountPercent": 0.0,
+      "RefundAmount": 0.0
+    }
+  },
+  {
+    "stream_id": "1770625913286-0",
+    "data": {
+      "StoreId": "STR003",
+      "CashierName": "Michael Chen",
+      "POSId": "POS-02",
+      "BillDate": "2026-02-09",
+      "SessionTime": 1770625915.136322,
+      "ModeOfTransaction": "Card",
+      "TransactionTotal": 214.98,
+      "DiscountPercent": 0.0,
+      "RefundAmount": 0.0
+    }
+  },
+  {
+    "stream_id": "1770625917897-0",
+    "data": {
+      "StoreId": "STR003",
+      "CashierName": "Sarah Johnson",
+      "POSId": "POS-01",
+      "BillDate": "2026-02-09",
+      "SessionTime": 1770625921.260121,
+      "ModeOfTransaction": "Cash",
+      "TransactionTotal": 478.05,
+      "DiscountPercent": 0.0,
+      "RefundAmount": 0.0
+    }
+  },
+  {
+    "stream_id": "1770625921339-0",
+    "data": {
+      "StoreId": "STR002",
+      "CashierName": "Sarah Johnson",
+      "POSId": "POS-01",
+      "BillDate": "2026-02-09",
+      "SessionTime": 1770625924.3125036,
+      "ModeOfTransaction": "UPI",
+      "TransactionTotal": 178.6,
+      "DiscountPercent": 27.41,
+      "RefundAmount": 0.0
+    }
+  },
+  {
+    "stream_id": "1770625926342-0",
+    "data": {
+      "StoreId": "STR002",
+      "CashierName": "Sarah Johnson",
+      "POSId": "POS-01",
+      "BillDate": "2026-02-09",
+      "SessionTime": 1770625928.7678075,
+      "ModeOfTransaction": "Card",
+      "TransactionTotal": 462.71,
+      "DiscountPercent": 0.0,
+      "RefundAmount": 0.0
+    }
+  },
+  {
+    "stream_id": "1770625929433-0",
+    "data": {
+      "StoreId": "STR002",
+      "CashierName": "Michael Chen",
+      "POSId": "POS-02",
+      "BillDate": "2026-02-09",
+      "SessionTime": 1770625933.3839257,
+      "ModeOfTransaction": "Card",
+      "TransactionTotal": 496.87,
+      "DiscountPercent": 0.0,
+      "RefundAmount": 0.0
+    }
+  },
+  {
+    "stream_id": "1770625933849-0",
+    "data": {
+      "StoreId": "STR003",
+      "CashierName": "Emily Rodriguez",
+      "POSId": "POS-03",
+      "BillDate": "2026-02-09",
+      "SessionTime": 1770625936.347132,
+      "ModeOfTransaction": "UPI",
+      "TransactionTotal": 294.67,
+      "DiscountPercent": 0.0,
+      "RefundAmount": 0.0
+    }
+  },
+  {
+    "stream_id": "1770625938992-0",
+    "data": {
+      "StoreId": "STR003",
+      "CashierName": "Michael Chen",
+      "POSId": "POS-02",
+      "BillDate": "2026-02-09",
+      "SessionTime": 1770625940.5529182,
+      "ModeOfTransaction": "Card",
+      "TransactionTotal": 457.87,
+      "DiscountPercent": 0.0,
+      "RefundAmount": 0.0
+    }
+  },
+  {
+    "stream_id": "1770625942776-0",
+    "data": {
+      "StoreId": "STR003",
+      "CashierName": "Sarah Johnson",
+      "POSId": "POS-01",
+      "BillDate": "2026-02-09",
+      "SessionTime": 1770625944.5351703,
+      "ModeOfTransaction": "Cash",
+      "TransactionTotal": 308.49,
+      "DiscountPercent": 0.0,
+      "RefundAmount": 0.0
+    }
+  },
+  {
+    "stream_id": "1770625945646-0",
+    "data": {
+      "StoreId": "STR003",
+      "CashierName": "Michael Chen",
+      "POSId": "POS-02",
+      "BillDate": "2026-02-09",
+      "SessionTime": 1770625948.4643211,
+      "ModeOfTransaction": "Card",
+      "TransactionTotal": 308.41,
+      "DiscountPercent": 0.0,
+      "RefundAmount": 0.0
+    }
+  },
+  {
+    "stream_id": "1770625948930-0",
+    "data": {
+      "StoreId": "STR001",
+      "CashierName": "Sarah Johnson",
+      "POSId": "POS-01",
+      "BillDate": "2026-02-09",
+      "SessionTime": 1770625952.916777,
+      "ModeOfTransaction": "Cash",
+      "TransactionTotal": 393.72,
+      "DiscountPercent": 0.0,
+      "RefundAmount": 0.0
+    }
+  },
+  {
+    "stream_id": "1770625952971-0",
+    "data": {
+      "StoreId": "STR001",
+      "CashierName": "Emily Rodriguez",
+      "POSId": "POS-03",
+      "BillDate": "2026-02-09",
+      "SessionTime": 1770625955.3127432,
+      "ModeOfTransaction": "UPI",
+      "TransactionTotal": 481.19,
+      "DiscountPercent": 23.16,
+      "RefundAmount": 0.0
+    }
+  },
+  {
+    "stream_id": "1770625957882-0",
+    "data": {
+      "StoreId": "STR002",
+      "CashierName": "Sarah Johnson",
+      "POSId": "POS-01",
+      "BillDate": "2026-02-09",
+      "SessionTime": 1770625960.1251137,
+      "ModeOfTransaction": "Card",
+      "TransactionTotal": 202.37,
+      "DiscountPercent": 0.0,
+      "RefundAmount": 0.0
+    }
+  },
+  {
+    "stream_id": "1770625960763-0",
+    "data": {
+      "StoreId": "STR002",
+      "CashierName": "Michael Chen",
+      "POSId": "POS-02",
+      "BillDate": "2026-02-09",
+      "SessionTime": 1770625963.648793,
+      "ModeOfTransaction": "Cash",
+      "TransactionTotal": 442.17,
+      "DiscountPercent": 0.0,
+      "RefundAmount": 0.0
+    }
+  },
+  {
+    "stream_id": "1770625965391-0",
+    "data": {
+      "StoreId": "STR001",
+      "CashierName": "Emily Rodriguez",
+      "POSId": "POS-03",
+      "BillDate": "2026-02-09",
+      "SessionTime": 1770625966.7999663,
+      "ModeOfTransaction": "UPI",
+      "TransactionTotal": 0.0,
+      "DiscountPercent": 0.0,
+      "RefundAmount": 24.16
+    }
+  },
+  {
+    "stream_id": "1770625968120-0",
+    "data": {
+      "StoreId": "STR002",
+      "CashierName": "Sarah Johnson",
+      "POSId": "POS-01",
+      "BillDate": "2026-02-09",
+      "SessionTime": 1770625971.7615528,
+      "ModeOfTransaction": "Card",
+      "TransactionTotal": 0.0,
+      "DiscountPercent": 0.0,
+      "RefundAmount": 12.66
+    }
+  },
+  {
+    "stream_id": "1770625972116-0",
+    "data": {
+      "StoreId": "STR003",
+      "CashierName": "Michael Chen",
+      "POSId": "POS-02",
+      "BillDate": "2026-02-09",
+      "SessionTime": 1770625973.8145256,
+      "ModeOfTransaction": "Cash",
+      "TransactionTotal": 325.73,
+      "DiscountPercent": 0.0,
+      "RefundAmount": 0.0
+    }
+  },
+  {
+    "stream_id": "1770625977245-0",
+    "data": {
+      "StoreId": "STR001",
+      "CashierName": "Michael Chen",
+      "POSId": "POS-02",
+      "BillDate": "2026-02-09",
+      "SessionTime": 1770625979.045579,
+      "ModeOfTransaction": "UPI",
+      "TransactionTotal": 0.0,
+      "DiscountPercent": 0.0,
+      "RefundAmount": 72.39
+    }
+  },
+  {
+    "stream_id": "1770625981802-0",
+    "data": {
+      "StoreId": "STR001",
+      "CashierName": "James Williams",
+      "POSId": "POS-04",
+      "BillDate": "2026-02-09",
+      "SessionTime": 1770625984.4145763,
+      "ModeOfTransaction": "Card",
+      "TransactionTotal": 111.61,
+      "DiscountPercent": 0.0,
+      "RefundAmount": 0.0
+    }
+  },
+  {
+    "stream_id": "1770625985197-0",
+    "data": {
+      "StoreId": "STR001",
+      "CashierName": "Michael Chen",
+      "POSId": "POS-02",
+      "BillDate": "2026-02-09",
+      "SessionTime": 1770625987.9242444,
+      "ModeOfTransaction": "UPI",
+      "TransactionTotal": 50.99,
+      "DiscountPercent": 0.0,
+      "RefundAmount": 0.0
+    }
+  },
+  {
+    "stream_id": "1770625988144-0",
+    "data": {
+      "StoreId": "STR003",
+      "CashierName": "Michael Chen",
+      "POSId": "POS-02",
+      "BillDate": "2026-02-09",
+      "SessionTime": 1770625990.7594557,
+      "ModeOfTransaction": "Cash",
+      "TransactionTotal": 442.26,
+      "DiscountPercent": 0.0,
+      "RefundAmount": 0.0
+    }
+  },
+  {
+    "stream_id": "1770625993077-0",
+    "data": {
+      "StoreId": "STR003",
+      "CashierName": "Sarah Johnson",
+      "POSId": "POS-01",
+      "BillDate": "2026-02-09",
+      "SessionTime": 1770625996.0853133,
+      "ModeOfTransaction": "UPI",
+      "TransactionTotal": 0.0,
+      "DiscountPercent": 0.0,
+      "RefundAmount": 72.46
+    }
+  },
+  {
+    "stream_id": "1770625997869-0",
+    "data": {
+      "StoreId": "STR003",
+      "CashierName": "Emily Rodriguez",
+      "POSId": "POS-03",
+      "BillDate": "2026-02-09",
+      "SessionTime": 1770626001.951605,
+      "ModeOfTransaction": "Card",
+      "TransactionTotal": 56.9,
+      "DiscountPercent": 0.0,
+      "RefundAmount": 0.0
+    }
+  },
+  {
+    "stream_id": "1770626002738-0",
+    "data": {
+      "StoreId": "STR003",
+      "CashierName": "James Williams",
+      "POSId": "POS-04",
+      "BillDate": "2026-02-09",
+      "SessionTime": 1770626004.6238153,
+      "ModeOfTransaction": "Cash",
+      "TransactionTotal": 161.11,
+      "DiscountPercent": 0.0,
+      "RefundAmount": 0.0
+    }
+  },
+  {
+    "stream_id": "1770626005324-0",
+    "data": {
+      "StoreId": "STR003",
+      "CashierName": "Sarah Johnson",
+      "POSId": "POS-01",
+      "BillDate": "2026-02-09",
+      "SessionTime": 1770626007.3086789,
+      "ModeOfTransaction": "Card",
+      "TransactionTotal": 141.17,
+      "DiscountPercent": 41.99,
+      "RefundAmount": 0.0
+    }
+  },
+  {
+    "stream_id": "1770626009575-0",
+    "data": {
+      "StoreId": "STR001",
+      "CashierName": "Michael Chen",
+      "POSId": "POS-02",
+      "BillDate": "2026-02-09",
+      "SessionTime": 1770626010.755131,
+      "ModeOfTransaction": "UPI",
+      "TransactionTotal": 61.88,
+      "DiscountPercent": 0.0,
+      "RefundAmount": 0.0
+    }
+  },
+  {
+    "stream_id": "1770626014103-0",
+    "data": {
+      "StoreId": "STR001",
+      "CashierName": "Emily Rodriguez",
+      "POSId": "POS-03",
+      "BillDate": "2026-02-09",
+      "SessionTime": 1770626017.4624166,
+      "ModeOfTransaction": "Card",
+      "TransactionTotal": 134.75,
+      "DiscountPercent": 0.0,
+      "RefundAmount": 0.0
+    }
+  },
+  {
+    "stream_id": "1770626017492-0",
+    "data": {
+      "StoreId": "STR002",
+      "CashierName": "Sarah Johnson",
+      "POSId": "POS-01",
+      "BillDate": "2026-02-09",
+      "SessionTime": 1770626021.7259092,
+      "ModeOfTransaction": "UPI",
+      "TransactionTotal": 366.68,
+      "DiscountPercent": 34.96,
+      "RefundAmount": 0.0
+    }
+  },
+  {
+    "stream_id": "1770626022619-0",
+    "data": {
+      "StoreId": "STR002",
+      "CashierName": "Emily Rodriguez",
+      "POSId": "POS-03",
+      "BillDate": "2026-02-09",
+      "SessionTime": 1770626023.6349728,
+      "ModeOfTransaction": "Cash",
+      "TransactionTotal": 490.78,
+      "DiscountPercent": 0.0,
+      "RefundAmount": 0.0
+    }
+  },
+  {
+    "stream_id": "1770626025246-0",
+    "data": {
+      "StoreId": "STR003",
+      "CashierName": "Michael Chen",
+      "POSId": "POS-02",
+      "BillDate": "2026-02-09",
+      "SessionTime": 1770626026.2434616,
+      "ModeOfTransaction": "UPI",
+      "TransactionTotal": 420.24,
+      "DiscountPercent": 0.0,
+      "RefundAmount": 0.0
+    }
+  },
+  {
+    "stream_id": "1770626029076-0",
+    "data": {
+      "StoreId": "STR001",
+      "CashierName": "James Williams",
+      "POSId": "POS-04",
+      "BillDate": "2026-02-09",
+      "SessionTime": 1770626033.5038402,
+      "ModeOfTransaction": "Card",
+      "TransactionTotal": 318.85,
+      "DiscountPercent": 0.0,
+      "RefundAmount": 0.0
+    }
+  },
+  {
+    "stream_id": "1770626032601-0",
+    "data": {
+      "StoreId": "STR003",
+      "CashierName": "Sarah Johnson",
+      "POSId": "POS-01",
+      "BillDate": "2026-02-09",
+      "SessionTime": 1770626037.1439114,
+      "ModeOfTransaction": "Cash",
+      "TransactionTotal": 385.8,
+      "DiscountPercent": 0.0,
+      "RefundAmount": 0.0
+    }
+  },
+  {
+    "stream_id": "1770626036968-0",
+    "data": {
+      "StoreId": "STR002",
+      "CashierName": "Emily Rodriguez",
+      "POSId": "POS-03",
+      "BillDate": "2026-02-09",
+      "SessionTime": 1770626041.5145047,
+      "ModeOfTransaction": "Card",
+      "TransactionTotal": 331.1,
+      "DiscountPercent": 35.98,
+      "RefundAmount": 0.0
+    }
+  },
+  {
+    "stream_id": "1770626042257-0",
+    "data": {
+      "StoreId": "STR001",
+      "CashierName": "Emily Rodriguez",
+      "POSId": "POS-03",
+      "BillDate": "2026-02-09",
+      "SessionTime": 1770626044.7900667,
+      "ModeOfTransaction": "UPI",
+      "TransactionTotal": 366.26,
+      "DiscountPercent": 0.0,
+      "RefundAmount": 0.0
+    }
+  },
+  {
+    "stream_id": "1770626045750-0",
+    "data": {
+      "StoreId": "STR001",
+      "CashierName": "James Williams",
+      "POSId": "POS-04",
+      "BillDate": "2026-02-09",
+      "SessionTime": 1770626049.6261616,
+      "ModeOfTransaction": "Card",
+      "TransactionTotal": 233.8,
+      "DiscountPercent": 0.0,
+      "RefundAmount": 0.0
+    }
+  },
+  {
+    "stream_id": "1770626048898-0",
+    "data": {
+      "StoreId": "STR002",
+      "CashierName": "Emily Rodriguez",
+      "POSId": "POS-03",
+      "BillDate": "2026-02-09",
+      "SessionTime": 1770626049.6482773,
+      "ModeOfTransaction": "Cash",
+      "TransactionTotal": 468.54,
+      "DiscountPercent": 0.0,
+      "RefundAmount": 0.0
+    }
+  },
+  {
+    "stream_id": "1770626053583-0",
+    "data": {
+      "StoreId": "STR001",
+      "CashierName": "James Williams",
+      "POSId": "POS-04",
+      "BillDate": "2026-02-09",
+      "SessionTime": 1770626057.9300337,
+      "ModeOfTransaction": "UPI",
+      "TransactionTotal": 341.66,
+      "DiscountPercent": 0.0,
+      "RefundAmount": 0.0
+    }
+  },
+  {
+    "stream_id": "1770626056793-0",
+    "data": {
+      "StoreId": "STR003",
+      "CashierName": "James Williams",
+      "POSId": "POS-04",
+      "BillDate": "2026-02-09",
+      "SessionTime": 1770626058.9904823,
+      "ModeOfTransaction": "Cash",
+      "TransactionTotal": 147.93,
+      "DiscountPercent": 0.0,
+      "RefundAmount": 0.0
+    }
+  },
+  {
+    "stream_id": "1770626060063-0",
+    "data": {
+      "StoreId": "STR001",
+      "CashierName": "Emily Rodriguez",
+      "POSId": "POS-03",
+      "BillDate": "2026-02-09",
+      "SessionTime": 1770626062.7280877,
+      "ModeOfTransaction": "Cash",
+      "TransactionTotal": 252.83,
+      "DiscountPercent": 0.0,
+      "RefundAmount": 0.0
+    }
+  },
+  {
+    "stream_id": "1770626065206-0",
+    "data": {
+      "StoreId": "STR003",
+      "CashierName": "Sarah Johnson",
+      "POSId": "POS-01",
+      "BillDate": "2026-02-09",
+      "SessionTime": 1770626068.5535512,
+      "ModeOfTransaction": "Card",
+      "TransactionTotal": 395.71,
+      "DiscountPercent": 0.0,
+      "RefundAmount": 0.0
+    }
+  },
+  {
+    "stream_id": "1770626468504-0",
+    "data": {
+      "StoreId": "STR001",
+      "CashierName": "Sarah Johnson",
+      "POSId": "POS-01",
+      "BillDate": "2026-02-09",
+      "SessionTime": 1770626471.382954,
+      "ModeOfTransaction": "Cash",
+      "TransactionTotal": 467.26,
+      "DiscountPercent": 0.0,
+      "RefundAmount": 0.0
+    }
+  },
+  {
+    "stream_id": "1770626478751-0",
+    "data": {
+      "StoreId": "STR001",
+      "CashierName": "Emily Rodriguez",
+      "POSId": "POS-03",
+      "BillDate": "2026-02-09",
+      "SessionTime": 1770626480.0279658,
+      "ModeOfTransaction": "UPI",
+      "TransactionTotal": 391.32,
+      "DiscountPercent": 0.0,
+      "RefundAmount": 0.0
+    }
+  },
+  {
+    "stream_id": "1770626489103-0",
+    "data": {
+      "StoreId": "STR002",
+      "CashierName": "Sarah Johnson",
+      "POSId": "POS-01",
+      "BillDate": "2026-02-09",
+      "SessionTime": 1770626491.2671022,
+      "ModeOfTransaction": "UPI",
+      "TransactionTotal": 220.49,
+      "DiscountPercent": 0.0,
+      "RefundAmount": 0.0
+    }
+  },
+  {
+    "stream_id": "1770626499224-0",
+    "data": {
+      "StoreId": "STR003",
+      "CashierName": "Emily Rodriguez",
+      "POSId": "POS-03",
+      "BillDate": "2026-02-09",
+      "SessionTime": 1770626501.7013288,
+      "ModeOfTransaction": "Cash",
+      "TransactionTotal": 485.5,
+      "DiscountPercent": 0.0,
+      "RefundAmount": 0.0
+    }
+  },
+  {
+    "stream_id": "1770626509334-0",
+    "data": {
+      "StoreId": "STR002",
+      "CashierName": "Emily Rodriguez",
+      "POSId": "POS-03",
+      "BillDate": "2026-02-09",
+      "SessionTime": 1770626512.6103523,
+      "ModeOfTransaction": "Cash",
+      "TransactionTotal": 68.16,
+      "DiscountPercent": 0.0,
+      "RefundAmount": 0.0
+    }
+  },
+  {
+    "stream_id": "1770626519592-0",
+    "data": {
+      "StoreId": "STR003",
+      "CashierName": "Michael Chen",
+      "POSId": "POS-02",
+      "BillDate": "2026-02-09",
+      "SessionTime": 1770626521.8882122,
+      "ModeOfTransaction": "Cash",
+      "TransactionTotal": 255.38,
+      "DiscountPercent": 0.0,
+      "RefundAmount": 0.0
+    }
+  },
+  {
+    "stream_id": "1770626529761-0",
+    "data": {
+      "StoreId": "STR003",
+      "CashierName": "Sarah Johnson",
+      "POSId": "POS-01",
+      "BillDate": "2026-02-09",
+      "SessionTime": 1770626530.6653283,
+      "ModeOfTransaction": "Cash",
+      "TransactionTotal": 0.0,
+      "DiscountPercent": 0.0,
+      "RefundAmount": 63.67
+    }
+  },
+  {
+    "stream_id": "1770626540144-0",
+    "data": {
+      "StoreId": "STR002",
+      "CashierName": "Sarah Johnson",
+      "POSId": "POS-01",
+      "BillDate": "2026-02-09",
+      "SessionTime": 1770626541.815526,
+      "ModeOfTransaction": "Card",
+      "TransactionTotal": 73.31,
+      "DiscountPercent": 0.0,
+      "RefundAmount": 0.0
+    }
+  },
+  {
+    "stream_id": "1770626550395-0",
+    "data": {
+      "StoreId": "STR003",
+      "CashierName": "Sarah Johnson",
+      "POSId": "POS-01",
+      "BillDate": "2026-02-09",
+      "SessionTime": 1770626554.0563798,
+      "ModeOfTransaction": "Cash",
+      "TransactionTotal": 234.03,
+      "DiscountPercent": 0.0,
+      "RefundAmount": 0.0
+    }
+  },
+  {
+    "stream_id": "1770626570530-0",
+    "data": {
+      "StoreId": "STR003",
+      "CashierName": "James Williams",
+      "POSId": "POS-04",
+      "BillDate": "2026-02-09",
+      "SessionTime": 1770626573.824453,
+      "ModeOfTransaction": "UPI",
+      "TransactionTotal": 368.93,
+      "DiscountPercent": 0.0,
+      "RefundAmount": 0.0
+    }
+  },
+  {
+    "stream_id": "1770626581023-0",
+    "data": {
+      "StoreId": "STR003",
+      "CashierName": "James Williams",
+      "POSId": "POS-04",
+      "BillDate": "2026-02-09",
+      "SessionTime": 1770626585.0277364,
+      "ModeOfTransaction": "Card",
+      "TransactionTotal": 0.0,
+      "DiscountPercent": 0.0,
+      "RefundAmount": 79.38
+    }
+  },
+  {
+    "stream_id": "1770626591376-0",
+    "data": {
+      "StoreId": "STR003",
+      "CashierName": "Emily Rodriguez",
+      "POSId": "POS-03",
+      "BillDate": "2026-02-09",
+      "SessionTime": 1770626595.5854096,
+      "ModeOfTransaction": "Card",
+      "TransactionTotal": 425.15,
+      "DiscountPercent": 0.0,
+      "RefundAmount": 0.0
+    }
+  },
+  {
+    "stream_id": "1770626601586-0",
+    "data": {
+      "StoreId": "STR003",
+      "CashierName": "James Williams",
+      "POSId": "POS-04",
+      "BillDate": "2026-02-09",
+      "SessionTime": 1770626605.1982362,
+      "ModeOfTransaction": "Card",
+      "TransactionTotal": 232.44,
+      "DiscountPercent": 0.0,
+      "RefundAmount": 0.0
+    }
+  },
+  {
+    "stream_id": "1770626611889-0",
+    "data": {
+      "StoreId": "STR002",
+      "CashierName": "Emily Rodriguez",
+      "POSId": "POS-03",
+      "BillDate": "2026-02-09",
+      "SessionTime": 1770626616.0934095,
+      "ModeOfTransaction": "UPI",
+      "TransactionTotal": 429.28,
+      "DiscountPercent": 0.0,
+      "RefundAmount": 0.0
+    }
+  },
+  {
+    "stream_id": "1770626622259-0",
+    "data": {
+      "StoreId": "STR002",
+      "CashierName": "Michael Chen",
+      "POSId": "POS-02",
+      "BillDate": "2026-02-09",
+      "SessionTime": 1770626624.5997005,
+      "ModeOfTransaction": "UPI",
+      "TransactionTotal": 179.13,
+      "DiscountPercent": 0.0,
+      "RefundAmount": 0.0
+    }
+  }
+]

@@ -1,0 +1,1402 @@
+[
+  {
+    "stream_id": "1770625739152-0",
+    "data": {
+      "StoreId": "STR003",
+      "CamId": "CAM-01",
+      "SellerWindowId": "STR003_CAM-01_W2",
+      "SessionId": "1770625739151_STR003_CAM-01_W2",
+      "BillDate": "2026-02-09",
+      "SessionStart": 1770625739.151677,
+      "SessionEnd": 1770625855.8815496,
+      "ModeOfTransaction": "Cash",
+      "ReceiptGenerationStatus": "true"
+    }
+  },
+  {
+    "stream_id": "1770625743561-0",
+    "data": {
+      "StoreId": "STR001",
+      "CamId": "CAM-02",
+      "SellerWindowId": "STR001_CAM-02_W2",
+      "SessionId": "1770625743560_STR001_CAM-02_W2",
+      "BillDate": "2026-02-09",
+      "SessionStart": 1770625743.560915,
+      "SessionEnd": 1770625857.9389403,
+      "ModeOfTransaction": "UPI",
+      "ReceiptGenerationStatus": "true"
+    }
+  },
+  {
+    "stream_id": "1770625748516-0",
+    "data": {
+      "StoreId": "STR001",
+      "CamId": "CAM-01",
+      "SellerWindowId": "STR001_CAM-01_W2",
+      "SessionId": "1770625748515_STR001_CAM-01_W2",
+      "BillDate": "2026-02-09",
+      "SessionStart": 1770625748.5159302,
+      "SessionEnd": 1770625797.62481,
+      "ModeOfTransaction": "UPI",
+      "ReceiptGenerationStatus": "true"
+    }
+  },
+  {
+    "stream_id": "1770625752189-0",
+    "data": {
+      "StoreId": "STR003",
+      "CamId": "CAM-01",
+      "SellerWindowId": "STR003_CAM-01_W2",
+      "SessionId": "1770625752188_STR003_CAM-01_W2",
+      "BillDate": "2026-02-09",
+      "SessionStart": 1770625752.188707,
+      "SessionEnd": 1770625791.4667027,
+      "ModeOfTransaction": "Card",
+      "ReceiptGenerationStatus": "true"
+    }
+  },
+  {
+    "stream_id": "1770625755626-0",
+    "data": {
+      "StoreId": "STR002",
+      "CamId": "CAM-02",
+      "SellerWindowId": "STR002_CAM-02_W2",
+      "SessionId": "1770625755626_STR002_CAM-02_W2",
+      "BillDate": "2026-02-09",
+      "SessionStart": 1770625755.626334,
+      "SessionEnd": 1770625853.7218227,
+      "ModeOfTransaction": "Card",
+      "ReceiptGenerationStatus": "true"
+    }
+  },
+  {
+    "stream_id": "1770625758066-0",
+    "data": {
+      "StoreId": "STR002",
+      "CamId": "CAM-01",
+      "SellerWindowId": "STR002_CAM-01_W2",
+      "SessionId": "1770625758065_STR002_CAM-01_W2",
+      "BillDate": "2026-02-09",
+      "SessionStart": 1770625758.0658739,
+      "SessionEnd": 1770625827.5049694,
+      "ModeOfTransaction": "UPI",
+      "ReceiptGenerationStatus": "false"
+    }
+  },
+  {
+    "stream_id": "1770625763290-0",
+    "data": {
+      "StoreId": "STR002",
+      "CamId": "CAM-02",
+      "SellerWindowId": "STR002_CAM-02_W2",
+      "SessionId": "1770625763290_STR002_CAM-02_W2",
+      "BillDate": "2026-02-09",
+      "SessionStart": 1770625763.290018,
+      "SessionEnd": 1770625839.0748165,
+      "ModeOfTransaction": "Cash",
+      "ReceiptGenerationStatus": "true"
+    }
+  },
+  {
+    "stream_id": "1770625766883-0",
+    "data": {
+      "StoreId": "STR002",
+      "CamId": "CAM-01",
+      "SellerWindowId": "STR002_CAM-01_W1",
+      "SessionId": "1770625766882_STR002_CAM-01_W1",
+      "BillDate": "2026-02-09",
+      "SessionStart": 1770625766.882485,
+      "SessionEnd": 1770625811.2083166,
+      "ModeOfTransaction": "UPI",
+      "ReceiptGenerationStatus": "true"
+    }
+  },
+  {
+    "stream_id": "1770625770486-0",
+    "data": {
+      "StoreId": "STR002",
+      "CamId": "CAM-01",
+      "SellerWindowId": "STR002_CAM-01_W1",
+      "SessionId": "1770625770485_STR002_CAM-01_W1",
+      "BillDate": "2026-02-09",
+      "SessionStart": 1770625770.4855769,
+      "SessionEnd": 1770625869.62864,
+      "ModeOfTransaction": "UPI",
+      "ReceiptGenerationStatus": "true"
+    }
+  },
+  {
+    "stream_id": "1770625773590-0",
+    "data": {
+      "StoreId": "STR001",
+      "CamId": "CAM-02",
+      "SellerWindowId": "STR001_CAM-02_W1",
+      "SessionId": "1770625773589_STR001_CAM-02_W1",
+      "BillDate": "2026-02-09",
+      "SessionStart": 1770625773.589503,
+      "SessionEnd": 1770625849.8705368,
+      "ModeOfTransaction": "UPI",
+      "ReceiptGenerationStatus": "true"
+    }
+  },
+  {
+    "stream_id": "1770625778590-0",
+    "data": {
+      "StoreId": "STR001",
+      "CamId": "CAM-01",
+      "SellerWindowId": "STR001_CAM-01_W1",
+      "SessionId": "1770625778590_STR001_CAM-01_W1",
+      "BillDate": "2026-02-09",
+      "SessionStart": 1770625778.5903912,
+      "SessionEnd": 1770625815.072748,
+      "ModeOfTransaction": "Cash",
+      "ReceiptGenerationStatus": "true"
+    }
+  },
+  {
+    "stream_id": "1770625782904-0",
+    "data": {
+      "StoreId": "STR002",
+      "CamId": "CAM-02",
+      "SellerWindowId": "STR002_CAM-02_W2",
+      "SessionId": "1770625782904_STR002_CAM-02_W2",
+      "BillDate": "2026-02-09",
+      "SessionStart": 1770625782.904493,
+      "SessionEnd": 1770625829.2874422,
+      "ModeOfTransaction": "Card",
+      "ReceiptGenerationStatus": "false"
+    }
+  },
+  {
+    "stream_id": "1770625788204-0",
+    "data": {
+      "StoreId": "STR003",
+      "CamId": "CAM-02",
+      "SellerWindowId": "STR003_CAM-02_W1",
+      "SessionId": "1770625788204_STR003_CAM-02_W1",
+      "BillDate": "2026-02-09",
+      "SessionStart": 1770625788.204412,
+      "SessionEnd": 1770625896.381006,
+      "ModeOfTransaction": "Cash",
+      "ReceiptGenerationStatus": "true"
+    }
+  },
+  {
+    "stream_id": "1770625792089-0",
+    "data": {
+      "StoreId": "STR002",
+      "CamId": "CAM-01",
+      "SellerWindowId": "STR002_CAM-01_W1",
+      "SessionId": "1770625792089_STR002_CAM-01_W1",
+      "BillDate": "2026-02-09",
+      "SessionStart": 1770625792.089241,
+      "SessionEnd": 1770625879.1868348,
+      "ModeOfTransaction": "Card",
+      "ReceiptGenerationStatus": "true"
+    }
+  },
+  {
+    "stream_id": "1770625794751-0",
+    "data": {
+      "StoreId": "STR002",
+      "CamId": "CAM-01",
+      "SellerWindowId": "STR002_CAM-01_W2",
+      "SessionId": "1770625794750_STR002_CAM-01_W2",
+      "BillDate": "2026-02-09",
+      "SessionStart": 1770625794.7509592,
+      "SessionEnd": 1770625862.5302577,
+      "ModeOfTransaction": "Cash",
+      "ReceiptGenerationStatus": "true"
+    }
+  },
+  {
+    "stream_id": "1770625800073-0",
+    "data": {
+      "StoreId": "STR001",
+      "CamId": "CAM-01",
+      "SellerWindowId": "STR001_CAM-01_W1",
+      "SessionId": "1770625800073_STR001_CAM-01_W1",
+      "BillDate": "2026-02-09",
+      "SessionStart": 1770625800.073465,
+      "SessionEnd": 1770625838.8576686,
+      "ModeOfTransaction": "UPI",
+      "ReceiptGenerationStatus": "true"
+    }
+  },
+  {
+    "stream_id": "1770625804008-0",
+    "data": {
+      "StoreId": "STR001",
+      "CamId": "CAM-02",
+      "SellerWindowId": "STR001_CAM-02_W2",
+      "SessionId": "1770625804008_STR001_CAM-02_W2",
+      "BillDate": "2026-02-09",
+      "SessionStart": 1770625804.008189,
+      "SessionEnd": 1770625871.1784744,
+      "ModeOfTransaction": "Cash",
+      "ReceiptGenerationStatus": "true"
+    }
+  },
+  {
+    "stream_id": "1770625808443-0",
+    "data": {
+      "StoreId": "STR002",
+      "CamId": "CAM-02",
+      "SellerWindowId": "STR002_CAM-02_W2",
+      "SessionId": "1770625808443_STR002_CAM-02_W2",
+      "BillDate": "2026-02-09",
+      "SessionStart": 1770625808.443168,
+      "SessionEnd": 1770625913.276309,
+      "ModeOfTransaction": "Card",
+      "ReceiptGenerationStatus": "true"
+    }
+  },
+  {
+    "stream_id": "1770625811775-0",
+    "data": {
+      "StoreId": "STR002",
+      "CamId": "CAM-01",
+      "SellerWindowId": "STR002_CAM-01_W1",
+      "SessionId": "1770625811775_STR002_CAM-01_W1",
+      "BillDate": "2026-02-09",
+      "SessionStart": 1770625811.77538,
+      "SessionEnd": 1770625914.3739595,
+      "ModeOfTransaction": "Cash",
+      "ReceiptGenerationStatus": "true"
+    }
+  },
+  {
+    "stream_id": "1770625815778-0",
+    "data": {
+      "StoreId": "STR003",
+      "CamId": "CAM-02",
+      "SellerWindowId": "STR003_CAM-02_W1",
+      "SessionId": "1770625815777_STR003_CAM-02_W1",
+      "BillDate": "2026-02-09",
+      "SessionStart": 1770625815.777639,
+      "SessionEnd": 1770625856.4741602,
+      "ModeOfTransaction": "Card",
+      "ReceiptGenerationStatus": "false"
+    }
+  },
+  {
+    "stream_id": "1770625819462-0",
+    "data": {
+      "StoreId": "STR001",
+      "CamId": "CAM-01",
+      "SellerWindowId": "STR001_CAM-01_W1",
+      "SessionId": "1770625819461_STR001_CAM-01_W1",
+      "BillDate": "2026-02-09",
+      "SessionStart": 1770625819.4617841,
+      "SessionEnd": 1770625923.958153,
+      "ModeOfTransaction": "UPI",
+      "ReceiptGenerationStatus": "true"
+    }
+  },
+  {
+    "stream_id": "1770625823138-0",
+    "data": {
+      "StoreId": "STR002",
+      "CamId": "CAM-01",
+      "SellerWindowId": "STR002_CAM-01_W1",
+      "SessionId": "1770625823138_STR002_CAM-01_W1",
+      "BillDate": "2026-02-09",
+      "SessionStart": 1770625823.138418,
+      "SessionEnd": 1770625854.5262396,
+      "ModeOfTransaction": "Cash",
+      "ReceiptGenerationStatus": "false"
+    }
+  },
+  {
+    "stream_id": "1770625825440-0",
+    "data": {
+      "StoreId": "STR002",
+      "CamId": "CAM-02",
+      "SellerWindowId": "STR002_CAM-02_W2",
+      "SessionId": "1770625825440_STR002_CAM-02_W2",
+      "BillDate": "2026-02-09",
+      "SessionStart": 1770625825.440222,
+      "SessionEnd": 1770625872.9665835,
+      "ModeOfTransaction": "Cash",
+      "ReceiptGenerationStatus": "true"
+    }
+  },
+  {
+    "stream_id": "1770625827889-0",
+    "data": {
+      "StoreId": "STR003",
+      "CamId": "CAM-01",
+      "SellerWindowId": "STR003_CAM-01_W1",
+      "SessionId": "1770625827888_STR003_CAM-01_W1",
+      "BillDate": "2026-02-09",
+      "SessionStart": 1770625827.8887732,
+      "SessionEnd": 1770625944.528591,
+      "ModeOfTransaction": "UPI",
+      "ReceiptGenerationStatus": "true"
+    }
+  },
+  {
+    "stream_id": "1770625832630-0",
+    "data": {
+      "StoreId": "STR002",
+      "CamId": "CAM-02",
+      "SellerWindowId": "STR002_CAM-02_W1",
+      "SessionId": "1770625832630_STR002_CAM-02_W1",
+      "BillDate": "2026-02-09",
+      "SessionStart": 1770625832.630172,
+      "SessionEnd": 1770625874.3426845,
+      "ModeOfTransaction": "UPI",
+      "ReceiptGenerationStatus": "true"
+    }
+  },
+  {
+    "stream_id": "1770625835712-0",
+    "data": {
+      "StoreId": "STR003",
+      "CamId": "CAM-02",
+      "SellerWindowId": "STR003_CAM-02_W1",
+      "SessionId": "1770625835711_STR003_CAM-02_W1",
+      "BillDate": "2026-02-09",
+      "SessionStart": 1770625835.711123,
+      "SessionEnd": 1770625884.2555513,
+      "ModeOfTransaction": "Cash",
+      "ReceiptGenerationStatus": "true"
+    }
+  },
+  {
+    "stream_id": "1770625840641-0",
+    "data": {
+      "StoreId": "STR003",
+      "CamId": "CAM-02",
+      "SellerWindowId": "STR003_CAM-02_W1",
+      "SessionId": "1770625840640_STR003_CAM-02_W1",
+      "BillDate": "2026-02-09",
+      "SessionStart": 1770625840.640728,
+      "SessionEnd": 1770625891.2373383,
+      "ModeOfTransaction": "Cash",
+      "ReceiptGenerationStatus": "true"
+    }
+  },
+  {
+    "stream_id": "1770625845698-0",
+    "data": {
+      "StoreId": "STR003",
+      "CamId": "CAM-01",
+      "SellerWindowId": "STR003_CAM-01_W1",
+      "SessionId": "1770625845697_STR003_CAM-01_W1",
+      "BillDate": "2026-02-09",
+      "SessionStart": 1770625845.697749,
+      "SessionEnd": 1770625880.2159963,
+      "ModeOfTransaction": "Card",
+      "ReceiptGenerationStatus": "false"
+    }
+  },
+  {
+    "stream_id": "1770625849011-0",
+    "data": {
+      "StoreId": "STR002",
+      "CamId": "CAM-02",
+      "SellerWindowId": "STR002_CAM-02_W2",
+      "SessionId": "1770625849010_STR002_CAM-02_W2",
+      "BillDate": "2026-02-09",
+      "SessionStart": 1770625849.0107589,
+      "SessionEnd": 1770625881.9885397,
+      "ModeOfTransaction": "Cash",
+      "ReceiptGenerationStatus": "true"
+    }
+  },
+  {
+    "stream_id": "1770625852117-0",
+    "data": {
+      "StoreId": "STR001",
+      "CamId": "CAM-02",
+      "SellerWindowId": "STR001_CAM-02_W1",
+      "SessionId": "1770625852116_STR001_CAM-02_W1",
+      "BillDate": "2026-02-09",
+      "SessionStart": 1770625852.116433,
+      "SessionEnd": 1770625903.1671505,
+      "ModeOfTransaction": "Cash",
+      "ReceiptGenerationStatus": "true"
+    }
+  },
+  {
+    "stream_id": "1770625855636-0",
+    "data": {
+      "StoreId": "STR001",
+      "CamId": "CAM-02",
+      "SellerWindowId": "STR001_CAM-02_W2",
+      "SessionId": "1770625855635_STR001_CAM-02_W2",
+      "BillDate": "2026-02-09",
+      "SessionStart": 1770625855.635531,
+      "SessionEnd": 1770625905.060515,
+      "ModeOfTransaction": "Card",
+      "ReceiptGenerationStatus": "true"
+    }
+  },
+  {
+    "stream_id": "1770625860355-0",
+    "data": {
+      "StoreId": "STR002",
+      "CamId": "CAM-02",
+      "SellerWindowId": "STR002_CAM-02_W1",
+      "SessionId": "1770625860354_STR002_CAM-02_W1",
+      "BillDate": "2026-02-09",
+      "SessionStart": 1770625860.354485,
+      "SessionEnd": 1770625949.7532976,
+      "ModeOfTransaction": "Card",
+      "ReceiptGenerationStatus": "true"
+    }
+  },
+  {
+    "stream_id": "1770625863611-0",
+    "data": {
+      "StoreId": "STR001",
+      "CamId": "CAM-02",
+      "SellerWindowId": "STR001_CAM-02_W2",
+      "SessionId": "1770625863611_STR001_CAM-02_W2",
+      "BillDate": "2026-02-09",
+      "SessionStart": 1770625863.6112819,
+      "SessionEnd": 1770625982.949207,
+      "ModeOfTransaction": "UPI",
+      "ReceiptGenerationStatus": "false"
+    }
+  },
+  {
+    "stream_id": "1770625868376-0",
+    "data": {
+      "StoreId": "STR003",
+      "CamId": "CAM-02",
+      "SellerWindowId": "STR003_CAM-02_W2",
+      "SessionId": "1770625868375_STR003_CAM-02_W2",
+      "BillDate": "2026-02-09",
+      "SessionStart": 1770625868.375612,
+      "SessionEnd": 1770625930.1710374,
+      "ModeOfTransaction": "UPI",
+      "ReceiptGenerationStatus": "true"
+    }
+  },
+  {
+    "stream_id": "1770625872612-0",
+    "data": {
+      "StoreId": "STR002",
+      "CamId": "CAM-01",
+      "SellerWindowId": "STR002_CAM-01_W2",
+      "SessionId": "1770625872612_STR002_CAM-01_W2",
+      "BillDate": "2026-02-09",
+      "SessionStart": 1770625872.6126988,
+      "SessionEnd": 1770625973.7432625,
+      "ModeOfTransaction": "Card",
+      "ReceiptGenerationStatus": "true"
+    }
+  },
+  {
+    "stream_id": "1770625877946-0",
+    "data": {
+      "StoreId": "STR003",
+      "CamId": "CAM-02",
+      "SellerWindowId": "STR003_CAM-02_W1",
+      "SessionId": "1770625877946_STR003_CAM-02_W1",
+      "BillDate": "2026-02-09",
+      "SessionStart": 1770625877.946215,
+      "SessionEnd": 1770625976.0319211,
+      "ModeOfTransaction": "Card",
+      "ReceiptGenerationStatus": "true"
+    }
+  },
+  {
+    "stream_id": "1770625880788-0",
+    "data": {
+      "StoreId": "STR001",
+      "CamId": "CAM-02",
+      "SellerWindowId": "STR001_CAM-02_W1",
+      "SessionId": "1770625880788_STR001_CAM-02_W1",
+      "BillDate": "2026-02-09",
+      "SessionStart": 1770625880.788378,
+      "SessionEnd": 1770625919.1674156,
+      "ModeOfTransaction": "Card",
+      "ReceiptGenerationStatus": "true"
+    }
+  },
+  {
+    "stream_id": "1770625885890-0",
+    "data": {
+      "StoreId": "STR001",
+      "CamId": "CAM-02",
+      "SellerWindowId": "STR001_CAM-02_W2",
+      "SessionId": "1770625885890_STR001_CAM-02_W2",
+      "BillDate": "2026-02-09",
+      "SessionStart": 1770625885.890359,
+      "SessionEnd": 1770625945.3793335,
+      "ModeOfTransaction": "Cash",
+      "ReceiptGenerationStatus": "true"
+    }
+  },
+  {
+    "stream_id": "1770625889516-0",
+    "data": {
+      "StoreId": "STR002",
+      "CamId": "CAM-01",
+      "SellerWindowId": "STR002_CAM-01_W2",
+      "SessionId": "1770625889515_STR002_CAM-01_W2",
+      "BillDate": "2026-02-09",
+      "SessionStart": 1770625889.515379,
+      "SessionEnd": 1770625934.783755,
+      "ModeOfTransaction": "Cash",
+      "ReceiptGenerationStatus": "true"
+    }
+  },
+  {
+    "stream_id": "1770625892418-0",
+    "data": {
+      "StoreId": "STR003",
+      "CamId": "CAM-02",
+      "SellerWindowId": "STR003_CAM-02_W1",
+      "SessionId": "1770625892417_STR003_CAM-02_W1",
+      "BillDate": "2026-02-09",
+      "SessionStart": 1770625892.417229,
+      "SessionEnd": 1770625933.513893,
+      "ModeOfTransaction": "Card",
+      "ReceiptGenerationStatus": "true"
+    }
+  },
+  {
+    "stream_id": "1770625895163-0",
+    "data": {
+      "StoreId": "STR002",
+      "CamId": "CAM-02",
+      "SellerWindowId": "STR002_CAM-02_W2",
+      "SessionId": "1770625895163_STR002_CAM-02_W2",
+      "BillDate": "2026-02-09",
+      "SessionStart": 1770625895.16308,
+      "SessionEnd": 1770625988.694303,
+      "ModeOfTransaction": "Card",
+      "ReceiptGenerationStatus": "true"
+    }
+  },
+  {
+    "stream_id": "1770625898793-0",
+    "data": {
+      "StoreId": "STR002",
+      "CamId": "CAM-02",
+      "SellerWindowId": "STR002_CAM-02_W2",
+      "SessionId": "1770625898791_STR002_CAM-02_W2",
+      "BillDate": "2026-02-09",
+      "SessionStart": 1770625898.791987,
+      "SessionEnd": 1770626012.91126,
+      "ModeOfTransaction": "Cash",
+      "ReceiptGenerationStatus": "true"
+    }
+  },
+  {
+    "stream_id": "1770625903551-0",
+    "data": {
+      "StoreId": "STR003",
+      "CamId": "CAM-01",
+      "SellerWindowId": "STR003_CAM-01_W1",
+      "SessionId": "1770625903550_STR003_CAM-01_W1",
+      "BillDate": "2026-02-09",
+      "SessionStart": 1770625903.5502138,
+      "SessionEnd": 1770625995.2368617,
+      "ModeOfTransaction": "Card",
+      "ReceiptGenerationStatus": "false"
+    }
+  },
+  {
+    "stream_id": "1770625906833-0",
+    "data": {
+      "StoreId": "STR001",
+      "CamId": "CAM-01",
+      "SellerWindowId": "STR001_CAM-01_W1",
+      "SessionId": "1770625906832_STR001_CAM-01_W1",
+      "BillDate": "2026-02-09",
+      "SessionStart": 1770625906.832897,
+      "SessionEnd": 1770625964.9676971,
+      "ModeOfTransaction": "Card",
+      "ReceiptGenerationStatus": "true"
+    }
+  },
+  {
+    "stream_id": "1770625910062-0",
+    "data": {
+      "StoreId": "STR002",
+      "CamId": "CAM-01",
+      "SellerWindowId": "STR002_CAM-01_W2",
+      "SessionId": "1770625910061_STR002_CAM-01_W2",
+      "BillDate": "2026-02-09",
+      "SessionStart": 1770625910.061962,
+      "SessionEnd": 1770626019.802159,
+      "ModeOfTransaction": "Cash",
+      "ReceiptGenerationStatus": "true"
+    }
+  },
+  {
+    "stream_id": "1770625912877-0",
+    "data": {
+      "StoreId": "STR003",
+      "CamId": "CAM-01",
+      "SellerWindowId": "STR003_CAM-01_W2",
+      "SessionId": "1770625912877_STR003_CAM-01_W2",
+      "BillDate": "2026-02-09",
+      "SessionStart": 1770625912.877059,
+      "SessionEnd": 1770625968.1347504,
+      "ModeOfTransaction": "Card",
+      "ReceiptGenerationStatus": "true"
+    }
+  },
+  {
+    "stream_id": "1770625917394-0",
+    "data": {
+      "StoreId": "STR003",
+      "CamId": "CAM-01",
+      "SellerWindowId": "STR003_CAM-01_W1",
+      "SessionId": "1770625917394_STR003_CAM-01_W1",
+      "BillDate": "2026-02-09",
+      "SessionStart": 1770625917.394419,
+      "SessionEnd": 1770625956.3555434,
+      "ModeOfTransaction": "Cash",
+      "ReceiptGenerationStatus": "true"
+    }
+  },
+  {
+    "stream_id": "1770625920935-0",
+    "data": {
+      "StoreId": "STR002",
+      "CamId": "CAM-01",
+      "SellerWindowId": "STR002_CAM-01_W1",
+      "SessionId": "1770625920935_STR002_CAM-01_W1",
+      "BillDate": "2026-02-09",
+      "SessionStart": 1770625920.935116,
+      "SessionEnd": 1770626039.0325663,
+      "ModeOfTransaction": "UPI",
+      "ReceiptGenerationStatus": "true"
+    }
+  },
+  {
+    "stream_id": "1770625926195-0",
+    "data": {
+      "StoreId": "STR002",
+      "CamId": "CAM-01",
+      "SellerWindowId": "STR002_CAM-01_W1",
+      "SessionId": "1770625926194_STR002_CAM-01_W1",
+      "BillDate": "2026-02-09",
+      "SessionStart": 1770625926.1943328,
+      "SessionEnd": 1770625992.5274203,
+      "ModeOfTransaction": "Card",
+      "ReceiptGenerationStatus": "true"
+    }
+  },
+  {
+    "stream_id": "1770625929074-0",
+    "data": {
+      "StoreId": "STR002",
+      "CamId": "CAM-01",
+      "SellerWindowId": "STR002_CAM-01_W2",
+      "SessionId": "1770625929074_STR002_CAM-01_W2",
+      "BillDate": "2026-02-09",
+      "SessionStart": 1770625929.074443,
+      "SessionEnd": 1770626047.784544,
+      "ModeOfTransaction": "Card",
+      "ReceiptGenerationStatus": "true"
+    }
+  },
+  {
+    "stream_id": "1770625933442-0",
+    "data": {
+      "StoreId": "STR003",
+      "CamId": "CAM-02",
+      "SellerWindowId": "STR003_CAM-02_W1",
+      "SessionId": "1770625933441_STR003_CAM-02_W1",
+      "BillDate": "2026-02-09",
+      "SessionStart": 1770625933.441409,
+      "SessionEnd": 1770626022.4742572,
+      "ModeOfTransaction": "UPI",
+      "ReceiptGenerationStatus": "true"
+    }
+  },
+  {
+    "stream_id": "1770625938785-0",
+    "data": {
+      "StoreId": "STR003",
+      "CamId": "CAM-01",
+      "SellerWindowId": "STR003_CAM-01_W2",
+      "SessionId": "1770625938784_STR003_CAM-01_W2",
+      "BillDate": "2026-02-09",
+      "SessionStart": 1770625938.784718,
+      "SessionEnd": 1770626011.6175354,
+      "ModeOfTransaction": "Card",
+      "ReceiptGenerationStatus": "true"
+    }
+  },
+  {
+    "stream_id": "1770625942323-0",
+    "data": {
+      "StoreId": "STR003",
+      "CamId": "CAM-01",
+      "SellerWindowId": "STR003_CAM-01_W1",
+      "SessionId": "1770625942323_STR003_CAM-01_W1",
+      "BillDate": "2026-02-09",
+      "SessionStart": 1770625942.323555,
+      "SessionEnd": 1770626047.740853,
+      "ModeOfTransaction": "Cash",
+      "ReceiptGenerationStatus": "true"
+    }
+  },
+  {
+    "stream_id": "1770625945493-0",
+    "data": {
+      "StoreId": "STR003",
+      "CamId": "CAM-01",
+      "SellerWindowId": "STR003_CAM-01_W2",
+      "SessionId": "1770625945492_STR003_CAM-01_W2",
+      "BillDate": "2026-02-09",
+      "SessionStart": 1770625945.492704,
+      "SessionEnd": 1770625991.0636277,
+      "ModeOfTransaction": "Card",
+      "ReceiptGenerationStatus": "false"
+    }
+  },
+  {
+    "stream_id": "1770625948581-0",
+    "data": {
+      "StoreId": "STR001",
+      "CamId": "CAM-01",
+      "SellerWindowId": "STR001_CAM-01_W1",
+      "SessionId": "1770625948580_STR001_CAM-01_W1",
+      "BillDate": "2026-02-09",
+      "SessionStart": 1770625948.5808058,
+      "SessionEnd": 1770625997.6587596,
+      "ModeOfTransaction": "Cash",
+      "ReceiptGenerationStatus": "true"
+    }
+  },
+  {
+    "stream_id": "1770625952854-0",
+    "data": {
+      "StoreId": "STR001",
+      "CamId": "CAM-02",
+      "SellerWindowId": "STR001_CAM-02_W1",
+      "SessionId": "1770625952854_STR001_CAM-02_W1",
+      "BillDate": "2026-02-09",
+      "SessionStart": 1770625952.8545,
+      "SessionEnd": 1770625990.1233203,
+      "ModeOfTransaction": "UPI",
+      "ReceiptGenerationStatus": "true"
+    }
+  },
+  {
+    "stream_id": "1770625957417-0",
+    "data": {
+      "StoreId": "STR002",
+      "CamId": "CAM-01",
+      "SellerWindowId": "STR002_CAM-01_W1",
+      "SessionId": "1770625957417_STR002_CAM-01_W1",
+      "BillDate": "2026-02-09",
+      "SessionStart": 1770625957.4172611,
+      "SessionEnd": 1770626031.3886518,
+      "ModeOfTransaction": "Card",
+      "ReceiptGenerationStatus": "true"
+    }
+  },
+  {
+    "stream_id": "1770625960603-0",
+    "data": {
+      "StoreId": "STR002",
+      "CamId": "CAM-01",
+      "SellerWindowId": "STR002_CAM-01_W2",
+      "SessionId": "1770625960602_STR002_CAM-01_W2",
+      "BillDate": "2026-02-09",
+      "SessionStart": 1770625960.6027992,
+      "SessionEnd": 1770626078.4717398,
+      "ModeOfTransaction": "Cash",
+      "ReceiptGenerationStatus": "true"
+    }
+  },
+  {
+    "stream_id": "1770625965086-0",
+    "data": {
+      "StoreId": "STR001",
+      "CamId": "CAM-02",
+      "SellerWindowId": "STR001_CAM-02_W1",
+      "SessionId": "1770625965085_STR001_CAM-02_W1",
+      "BillDate": "2026-02-09",
+      "SessionStart": 1770625965.085454,
+      "SessionEnd": 1770625996.1713548,
+      "ModeOfTransaction": "UPI",
+      "ReceiptGenerationStatus": "true"
+    }
+  },
+  {
+    "stream_id": "1770625967637-0",
+    "data": {
+      "StoreId": "STR002",
+      "CamId": "CAM-01",
+      "SellerWindowId": "STR002_CAM-01_W1",
+      "SessionId": "1770625967637_STR002_CAM-01_W1",
+      "BillDate": "2026-02-09",
+      "SessionStart": 1770625967.637513,
+      "SessionEnd": 1770626032.9932675,
+      "ModeOfTransaction": "Card",
+      "ReceiptGenerationStatus": "true"
+    }
+  },
+  {
+    "stream_id": "1770625971726-0",
+    "data": {
+      "StoreId": "STR003",
+      "CamId": "CAM-01",
+      "SellerWindowId": "STR003_CAM-01_W2",
+      "SessionId": "1770625971725_STR003_CAM-01_W2",
+      "BillDate": "2026-02-09",
+      "SessionStart": 1770625971.7254279,
+      "SessionEnd": 1770626050.7290812,
+      "ModeOfTransaction": "Cash",
+      "ReceiptGenerationStatus": "true"
+    }
+  },
+  {
+    "stream_id": "1770625977041-0",
+    "data": {
+      "StoreId": "STR001",
+      "CamId": "CAM-01",
+      "SellerWindowId": "STR001_CAM-01_W2",
+      "SessionId": "1770625977040_STR001_CAM-01_W2",
+      "BillDate": "2026-02-09",
+      "SessionStart": 1770625977.040873,
+      "SessionEnd": 1770626062.7102323,
+      "ModeOfTransaction": "UPI",
+      "ReceiptGenerationStatus": "true"
+    }
+  },
+  {
+    "stream_id": "1770625981396-0",
+    "data": {
+      "StoreId": "STR001",
+      "CamId": "CAM-02",
+      "SellerWindowId": "STR001_CAM-02_W2",
+      "SessionId": "1770625981395_STR001_CAM-02_W2",
+      "BillDate": "2026-02-09",
+      "SessionStart": 1770625981.395786,
+      "SessionEnd": 1770626016.7687275,
+      "ModeOfTransaction": "Card",
+      "ReceiptGenerationStatus": "true"
+    }
+  },
+  {
+    "stream_id": "1770625985045-0",
+    "data": {
+      "StoreId": "STR001",
+      "CamId": "CAM-01",
+      "SellerWindowId": "STR001_CAM-01_W2",
+      "SessionId": "1770625985044_STR001_CAM-01_W2",
+      "BillDate": "2026-02-09",
+      "SessionStart": 1770625985.044744,
+      "SessionEnd": 1770626074.6266708,
+      "ModeOfTransaction": "UPI",
+      "ReceiptGenerationStatus": "false"
+    }
+  },
+  {
+    "stream_id": "1770625987669-0",
+    "data": {
+      "StoreId": "STR003",
+      "CamId": "CAM-01",
+      "SellerWindowId": "STR003_CAM-01_W2",
+      "SessionId": "1770625987669_STR003_CAM-01_W2",
+      "BillDate": "2026-02-09",
+      "SessionStart": 1770625987.6695051,
+      "SessionEnd": 1770626057.845579,
+      "ModeOfTransaction": "Cash",
+      "ReceiptGenerationStatus": "true"
+    }
+  },
+  {
+    "stream_id": "1770625992646-0",
+    "data": {
+      "StoreId": "STR003",
+      "CamId": "CAM-01",
+      "SellerWindowId": "STR003_CAM-01_W1",
+      "SessionId": "1770625992645_STR003_CAM-01_W1",
+      "BillDate": "2026-02-09",
+      "SessionStart": 1770625992.645707,
+      "SessionEnd": 1770626072.9645586,
+      "ModeOfTransaction": "UPI",
+      "ReceiptGenerationStatus": "true"
+    }
+  },
+  {
+    "stream_id": "1770625997606-0",
+    "data": {
+      "StoreId": "STR003",
+      "CamId": "CAM-02",
+      "SellerWindowId": "STR003_CAM-02_W1",
+      "SessionId": "1770625997606_STR003_CAM-02_W1",
+      "BillDate": "2026-02-09",
+      "SessionStart": 1770625997.6061828,
+      "SessionEnd": 1770626080.1802814,
+      "ModeOfTransaction": "Card",
+      "ReceiptGenerationStatus": "true"
+    }
+  },
+  {
+    "stream_id": "1770626002250-0",
+    "data": {
+      "StoreId": "STR003",
+      "CamId": "CAM-02",
+      "SellerWindowId": "STR003_CAM-02_W2",
+      "SessionId": "1770626002250_STR003_CAM-02_W2",
+      "BillDate": "2026-02-09",
+      "SessionStart": 1770626002.250185,
+      "SessionEnd": 1770626117.3892117,
+      "ModeOfTransaction": "Cash",
+      "ReceiptGenerationStatus": "true"
+    }
+  },
+  {
+    "stream_id": "1770626005158-0",
+    "data": {
+      "StoreId": "STR003",
+      "CamId": "CAM-01",
+      "SellerWindowId": "STR003_CAM-01_W1",
+      "SessionId": "1770626005158_STR003_CAM-01_W1",
+      "BillDate": "2026-02-09",
+      "SessionStart": 1770626005.158331,
+      "SessionEnd": 1770626107.503497,
+      "ModeOfTransaction": "Card",
+      "ReceiptGenerationStatus": "true"
+    }
+  },
+  {
+    "stream_id": "1770626009118-0",
+    "data": {
+      "StoreId": "STR001",
+      "CamId": "CAM-01",
+      "SellerWindowId": "STR001_CAM-01_W2",
+      "SessionId": "1770626009118_STR001_CAM-01_W2",
+      "BillDate": "2026-02-09",
+      "SessionStart": 1770626009.118241,
+      "SessionEnd": 1770626060.3655581,
+      "ModeOfTransaction": "UPI",
+      "ReceiptGenerationStatus": "true"
+    }
+  },
+  {
+    "stream_id": "1770626013911-0",
+    "data": {
+      "StoreId": "STR001",
+      "CamId": "CAM-02",
+      "SellerWindowId": "STR001_CAM-02_W1",
+      "SessionId": "1770626013910_STR001_CAM-02_W1",
+      "BillDate": "2026-02-09",
+      "SessionStart": 1770626013.9107468,
+      "SessionEnd": 1770626117.2448206,
+      "ModeOfTransaction": "Card",
+      "ReceiptGenerationStatus": "true"
+    }
+  },
+  {
+    "stream_id": "1770626017188-0",
+    "data": {
+      "StoreId": "STR002",
+      "CamId": "CAM-01",
+      "SellerWindowId": "STR002_CAM-01_W1",
+      "SessionId": "1770626017188_STR002_CAM-01_W1",
+      "BillDate": "2026-02-09",
+      "SessionStart": 1770626017.1883469,
+      "SessionEnd": 1770626067.0211036,
+      "ModeOfTransaction": "UPI",
+      "ReceiptGenerationStatus": "true"
+    }
+  },
+  {
+    "stream_id": "1770626022369-0",
+    "data": {
+      "StoreId": "STR002",
+      "CamId": "CAM-02",
+      "SellerWindowId": "STR002_CAM-02_W1",
+      "SessionId": "1770626022368_STR002_CAM-02_W1",
+      "BillDate": "2026-02-09",
+      "SessionStart": 1770626022.3686972,
+      "SessionEnd": 1770626109.853264,
+      "ModeOfTransaction": "Cash",
+      "ReceiptGenerationStatus": "true"
+    }
+  },
+  {
+    "stream_id": "1770626024826-0",
+    "data": {
+      "StoreId": "STR003",
+      "CamId": "CAM-01",
+      "SellerWindowId": "STR003_CAM-01_W2",
+      "SessionId": "1770626024826_STR003_CAM-01_W2",
+      "BillDate": "2026-02-09",
+      "SessionStart": 1770626024.826224,
+      "SessionEnd": 1770626129.267669,
+      "ModeOfTransaction": "UPI",
+      "ReceiptGenerationStatus": "true"
+    }
+  },
+  {
+    "stream_id": "1770626028693-0",
+    "data": {
+      "StoreId": "STR001",
+      "CamId": "CAM-02",
+      "SellerWindowId": "STR001_CAM-02_W2",
+      "SessionId": "1770626028692_STR001_CAM-02_W2",
+      "BillDate": "2026-02-09",
+      "SessionStart": 1770626028.692756,
+      "SessionEnd": 1770626062.746093,
+      "ModeOfTransaction": "Card",
+      "ReceiptGenerationStatus": "true"
+    }
+  },
+  {
+    "stream_id": "1770626032157-0",
+    "data": {
+      "StoreId": "STR003",
+      "CamId": "CAM-01",
+      "SellerWindowId": "STR003_CAM-01_W1",
+      "SessionId": "1770626032156_STR003_CAM-01_W1",
+      "BillDate": "2026-02-09",
+      "SessionStart": 1770626032.156563,
+      "SessionEnd": 1770626126.884584,
+      "ModeOfTransaction": "Cash",
+      "ReceiptGenerationStatus": "true"
+    }
+  },
+  {
+    "stream_id": "1770626036786-0",
+    "data": {
+      "StoreId": "STR002",
+      "CamId": "CAM-02",
+      "SellerWindowId": "STR002_CAM-02_W1",
+      "SessionId": "1770626036786_STR002_CAM-02_W1",
+      "BillDate": "2026-02-09",
+      "SessionStart": 1770626036.7862668,
+      "SessionEnd": 1770626104.7736664,
+      "ModeOfTransaction": "Card",
+      "ReceiptGenerationStatus": "true"
+    }
+  },
+  {
+    "stream_id": "1770626041754-0",
+    "data": {
+      "StoreId": "STR001",
+      "CamId": "CAM-02",
+      "SellerWindowId": "STR001_CAM-02_W1",
+      "SessionId": "1770626041754_STR001_CAM-02_W1",
+      "BillDate": "2026-02-09",
+      "SessionStart": 1770626041.754234,
+      "SessionEnd": 1770626096.815007,
+      "ModeOfTransaction": "UPI",
+      "ReceiptGenerationStatus": "true"
+    }
+  },
+  {
+    "stream_id": "1770626045392-0",
+    "data": {
+      "StoreId": "STR001",
+      "CamId": "CAM-02",
+      "SellerWindowId": "STR001_CAM-02_W2",
+      "SessionId": "1770626045391_STR001_CAM-02_W2",
+      "BillDate": "2026-02-09",
+      "SessionStart": 1770626045.3919418,
+      "SessionEnd": 1770626142.5494204,
+      "ModeOfTransaction": "Card",
+      "ReceiptGenerationStatus": "true"
+    }
+  },
+  {
+    "stream_id": "1770626048449-0",
+    "data": {
+      "StoreId": "STR002",
+      "CamId": "CAM-02",
+      "SellerWindowId": "STR002_CAM-02_W1",
+      "SessionId": "1770626048449_STR002_CAM-02_W1",
+      "BillDate": "2026-02-09",
+      "SessionStart": 1770626048.449014,
+      "SessionEnd": 1770626142.6426322,
+      "ModeOfTransaction": "Cash",
+      "ReceiptGenerationStatus": "true"
+    }
+  },
+  {
+    "stream_id": "1770626053415-0",
+    "data": {
+      "StoreId": "STR001",
+      "CamId": "CAM-02",
+      "SellerWindowId": "STR001_CAM-02_W2",
+      "SessionId": "1770626053414_STR001_CAM-02_W2",
+      "BillDate": "2026-02-09",
+      "SessionStart": 1770626053.4143932,
+      "SessionEnd": 1770626122.4044158,
+      "ModeOfTransaction": "UPI",
+      "ReceiptGenerationStatus": "true"
+    }
+  },
+  {
+    "stream_id": "1770626056611-0",
+    "data": {
+      "StoreId": "STR003",
+      "CamId": "CAM-02",
+      "SellerWindowId": "STR003_CAM-02_W2",
+      "SessionId": "1770626056610_STR003_CAM-02_W2",
+      "BillDate": "2026-02-09",
+      "SessionStart": 1770626056.610816,
+      "SessionEnd": 1770626136.4361339,
+      "ModeOfTransaction": "Cash",
+      "ReceiptGenerationStatus": "true"
+    }
+  },
+  {
+    "stream_id": "1770626059842-0",
+    "data": {
+      "StoreId": "STR001",
+      "CamId": "CAM-02",
+      "SellerWindowId": "STR001_CAM-02_W1",
+      "SessionId": "1770626059842_STR001_CAM-02_W1",
+      "BillDate": "2026-02-09",
+      "SessionStart": 1770626059.842082,
+      "SessionEnd": 1770626136.6079507,
+      "ModeOfTransaction": "Cash",
+      "ReceiptGenerationStatus": "true"
+    }
+  },
+  {
+    "stream_id": "1770626064921-0",
+    "data": {
+      "StoreId": "STR003",
+      "CamId": "CAM-01",
+      "SellerWindowId": "STR003_CAM-01_W1",
+      "SessionId": "1770626064920_STR003_CAM-01_W1",
+      "BillDate": "2026-02-09",
+      "SessionStart": 1770626064.9206772,
+      "SessionEnd": 1770626175.1669254,
+      "ModeOfTransaction": "Card",
+      "ReceiptGenerationStatus": "true"
+    }
+  },
+  {
+    "stream_id": "1770626468360-0",
+    "data": {
+      "StoreId": "STR001",
+      "CamId": "CAM-01",
+      "SellerWindowId": "STR001_CAM-01_W1",
+      "SessionId": "1770626468357_STR001_CAM-01_W1",
+      "BillDate": "2026-02-09",
+      "SessionStart": 1770626468.357526,
+      "SessionEnd": 1770626568.1118174,
+      "ModeOfTransaction": "Card",
+      "ReceiptGenerationStatus": "true"
+    }
+  },
+  {
+    "stream_id": "1770626478510-0",
+    "data": {
+      "StoreId": "STR001",
+      "CamId": "CAM-02",
+      "SellerWindowId": "STR001_CAM-02_W1",
+      "SessionId": "1770626478509_STR001_CAM-02_W1",
+      "BillDate": "2026-02-09",
+      "SessionStart": 1770626478.509974,
+      "SessionEnd": 1770626584.0686774,
+      "ModeOfTransaction": "UPI",
+      "ReceiptGenerationStatus": "true"
+    }
+  },
+  {
+    "stream_id": "1770626488755-0",
+    "data": {
+      "StoreId": "STR002",
+      "CamId": "CAM-01",
+      "SellerWindowId": "STR002_CAM-01_W1",
+      "SessionId": "1770626488754_STR002_CAM-01_W1",
+      "BillDate": "2026-02-09",
+      "SessionStart": 1770626488.7546198,
+      "SessionEnd": 1770626537.4699507,
+      "ModeOfTransaction": "UPI",
+      "ReceiptGenerationStatus": "true"
+    }
+  },
+  {
+    "stream_id": "1770626499111-0",
+    "data": {
+      "StoreId": "STR003",
+      "CamId": "CAM-02",
+      "SellerWindowId": "STR003_CAM-02_W1",
+      "SessionId": "1770626499110_STR003_CAM-02_W1",
+      "BillDate": "2026-02-09",
+      "SessionStart": 1770626499.11065,
+      "SessionEnd": 1770626614.607083,
+      "ModeOfTransaction": "Cash",
+      "ReceiptGenerationStatus": "false"
+    }
+  },
+  {
+    "stream_id": "1770626509229-0",
+    "data": {
+      "StoreId": "STR002",
+      "CamId": "CAM-02",
+      "SellerWindowId": "STR002_CAM-02_W1",
+      "SessionId": "1770626509228_STR002_CAM-02_W1",
+      "BillDate": "2026-02-09",
+      "SessionStart": 1770626509.2287319,
+      "SessionEnd": 1770626594.7515595,
+      "ModeOfTransaction": "Cash",
+      "ReceiptGenerationStatus": "false"
+    }
+  },
+  {
+    "stream_id": "1770626519341-0",
+    "data": {
+      "StoreId": "STR003",
+      "CamId": "CAM-01",
+      "SellerWindowId": "STR003_CAM-01_W2",
+      "SessionId": "1770626519340_STR003_CAM-01_W2",
+      "BillDate": "2026-02-09",
+      "SessionStart": 1770626519.3409421,
+      "SessionEnd": 1770626615.9509792,
+      "ModeOfTransaction": "Cash",
+      "ReceiptGenerationStatus": "true"
+    }
+  },
+  {
+    "stream_id": "1770626529596-0",
+    "data": {
+      "StoreId": "STR003",
+      "CamId": "CAM-01",
+      "SellerWindowId": "STR003_CAM-01_W1",
+      "SessionId": "1770626529595_STR003_CAM-01_W1",
+      "BillDate": "2026-02-09",
+      "SessionStart": 1770626529.595903,
+      "SessionEnd": 1770626560.726705,
+      "ModeOfTransaction": "Cash",
+      "ReceiptGenerationStatus": "true"
+    }
+  },
+  {
+    "stream_id": "1770626539767-0",
+    "data": {
+      "StoreId": "STR002",
+      "CamId": "CAM-01",
+      "SellerWindowId": "STR002_CAM-01_W1",
+      "SessionId": "1770626539766_STR002_CAM-01_W1",
+      "BillDate": "2026-02-09",
+      "SessionStart": 1770626539.7663019,
+      "SessionEnd": 1770626609.4993477,
+      "ModeOfTransaction": "Card",
+      "ReceiptGenerationStatus": "true"
+    }
+  },
+  {
+    "stream_id": "1770626550149-0",
+    "data": {
+      "StoreId": "STR003",
+      "CamId": "CAM-01",
+      "SellerWindowId": "STR003_CAM-01_W1",
+      "SessionId": "1770626550148_STR003_CAM-01_W1",
+      "BillDate": "2026-02-09",
+      "SessionStart": 1770626550.1485991,
+      "SessionEnd": 1770626654.214884,
+      "ModeOfTransaction": "Cash",
+      "ReceiptGenerationStatus": "true"
+    }
+  },
+  {
+    "stream_id": "1770626560399-0",
+    "data": {
+      "StoreId": "STR003",
+      "CamId": "CAM-01",
+      "SellerWindowId": "STR003_CAM-01_W2",
+      "SessionId": "1770626560399_STR003_CAM-01_W2",
+      "BillDate": "2026-02-09",
+      "SessionStart": 1770626560.399408,
+      "SessionEnd": 1770626633.3681965,
+      "ModeOfTransaction": "Cash",
+      "ReceiptGenerationStatus": "true"
+    }
+  },
+  {
+    "stream_id": "1770626570403-0",
+    "data": {
+      "StoreId": "STR003",
+      "CamId": "CAM-02",
+      "SellerWindowId": "STR003_CAM-02_W2",
+      "SessionId": "1770626570402_STR003_CAM-02_W2",
+      "BillDate": "2026-02-09",
+      "SessionStart": 1770626570.402668,
+      "SessionEnd": 1770626641.2183328,
+      "ModeOfTransaction": "UPI",
+      "ReceiptGenerationStatus": "false"
+    }
+  },
+  {
+    "stream_id": "1770626580535-0",
+    "data": {
+      "StoreId": "STR003",
+      "CamId": "CAM-02",
+      "SellerWindowId": "STR003_CAM-02_W2",
+      "SessionId": "1770626580535_STR003_CAM-02_W2",
+      "BillDate": "2026-02-09",
+      "SessionStart": 1770626580.535179,
+      "SessionEnd": 1770626649.342786,
+      "ModeOfTransaction": "Card",
+      "ReceiptGenerationStatus": "true"
+    }
+  },
+  {
+    "stream_id": "1770626591033-0",
+    "data": {
+      "StoreId": "STR003",
+      "CamId": "CAM-02",
+      "SellerWindowId": "STR003_CAM-02_W1",
+      "SessionId": "1770626591033_STR003_CAM-02_W1",
+      "BillDate": "2026-02-09",
+      "SessionStart": 1770626591.033372,
+      "SessionEnd": 1770626633.0036252,
+      "ModeOfTransaction": "Card",
+      "ReceiptGenerationStatus": "false"
+    }
+  },
+  {
+    "stream_id": "1770626601382-0",
+    "data": {
+      "StoreId": "STR003",
+      "CamId": "CAM-02",
+      "SellerWindowId": "STR003_CAM-02_W2",
+      "SessionId": "1770626601381_STR003_CAM-02_W2",
+      "BillDate": "2026-02-09",
+      "SessionStart": 1770626601.3815491,
+      "SessionEnd": 1770626632.6061828,
+      "ModeOfTransaction": "Card",
+      "ReceiptGenerationStatus": "true"
+    }
+  },
+  {
+    "stream_id": "1770626611591-0",
+    "data": {
+      "StoreId": "STR002",
+      "CamId": "CAM-02",
+      "SellerWindowId": "STR002_CAM-02_W1",
+      "SessionId": "1770626611591_STR002_CAM-02_W1",
+      "BillDate": "2026-02-09",
+      "SessionStart": 1770626611.591449,
+      "SessionEnd": 1770626691.8278453,
+      "ModeOfTransaction": "UPI",
+      "ReceiptGenerationStatus": "true"
+    }
+  },
+  {
+    "stream_id": "1770626621894-0",
+    "data": {
+      "StoreId": "STR002",
+      "CamId": "CAM-01",
+      "SellerWindowId": "STR002_CAM-01_W2",
+      "SessionId": "1770626621894_STR002_CAM-01_W2",
+      "BillDate": "2026-02-09",
+      "SessionStart": 1770626621.894206,
+      "SessionEnd": 1770626733.945492,
+      "ModeOfTransaction": "UPI",
+      "ReceiptGenerationStatus": "true"
+    }
+  }
+]

@@ -30,7 +30,8 @@ class StreamSimulator:
         1. Genuine Transaction (Matches)
         2. High Severity:
            - Payment Mismatch
-           - Phantom Scan (VAS exists, POS missing)
+           - Phantom Scan (VAS exists, POS missing) -> missed_pos
+           - Missed VAS (POS exists, VAS missing) -> missed_vas
         3. Medium Severity:
            - High Discount (> 20%)
            - Refund (> 0)
@@ -39,10 +40,10 @@ class StreamSimulator:
         scenario_type = random.choices(
             [
                 "genuine", 
-                "payment_mismatch", "phantom_scan", 
+                "payment_mismatch", "phantom_scan", "missed_vas",
                 "high_discount", "refund", "bill_not_generated"
             ],
-            weights=[0.6, 0.05, 0.05, 0.1, 0.1, 0.1]
+            weights=[0.5, 0.05, 0.05, 0.05, 0.1, 0.1, 0.15]
         )[0]
 
         store, lane, seller_window_id = self._generate_ids()
@@ -57,17 +58,19 @@ class StreamSimulator:
         if scenario_type == "bill_not_generated":
             receipt_status = False
 
-        vas_event = VASEvent(
-            StoreId=store,
-            CamId=lane["cam_id"],
-            SellerWindowId=seller_window_id,
-            SessionId=session_id,
-            BillDate=bill_date,
-            SessionStart=now,
-            SessionEnd=now + random.uniform(30, 120),
-            ModeOfTransaction=vas_mode,
-            ReceiptGenerationStatus=receipt_status
-        )
+        vas_event = None
+        if scenario_type != "missed_vas":
+            vas_event = VASEvent(
+                StoreId=store,
+                CamId=lane["cam_id"],
+                SellerWindowId=seller_window_id,
+                SessionId=session_id,
+                BillDate=bill_date,
+                SessionStart=now,
+                SessionEnd=now + random.uniform(30, 120),
+                ModeOfTransaction=vas_mode,
+                ReceiptGenerationStatus=receipt_status
+            )
 
         pos_event = None
         
@@ -81,7 +84,7 @@ class StreamSimulator:
             discount = random.uniform(21.0, 50.0)
         elif scenario_type == "refund":
             refund = random.uniform(10.0, 100.0)
-            transaction_total = 0.0 # Or negative? Usually refunds are separate transactions but let's just flag the amount.
+            transaction_total = 0.0 
         elif scenario_type == "payment_mismatch":
             available_modes = list(TransactionMode)
             if vas_mode in available_modes:
@@ -111,15 +114,16 @@ class StreamSimulator:
             # Yield events with slight random delays to simulate real network conditions
             # We yield a tuple (type, data)
             
-            yield ("VAS", vas)
+            if vas:
+                yield ("VAS", vas)
             
             if pos:
                 # Simulate POS arriving slightly later or earlier
                 await asyncio.sleep(random.uniform(0.1, 0.5))
                 yield ("POS", pos)
             
-            # Wait before next transaction
-            await asyncio.sleep(random.uniform(2, 5))
+            # Wait before next transaction - 10 seconds as requested
+            await asyncio.sleep(10)
 
     def stop(self):
         self.running = False

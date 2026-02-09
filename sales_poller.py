@@ -24,8 +24,8 @@ class SalesPoller:
 
         payload = {
             "cin": self.cin,
-            "from": "1765778611", #from_time,
-            "to": "1765951411", #to_time,
+            "from": str(from_time),
+            "to": str(to_time),
             "pageNo": "1"
         }
 

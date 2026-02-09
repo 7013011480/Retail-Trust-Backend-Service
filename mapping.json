@@ -1,0 +1,91 @@
+{
+    "stores": [
+        {
+            "store_id": "STR001",
+            "lanes": [
+                {
+                    "cam_id": "CAM-01",
+                    "window_id": "W1",
+                    "pos_id": "POS-01",
+                    "cashier": "Sarah Johnson"
+                },
+                {
+                    "cam_id": "CAM-01",
+                    "window_id": "W2",
+                    "pos_id": "POS-02",
+                    "cashier": "Michael Chen"
+                },
+                {
+                    "cam_id": "CAM-02",
+                    "window_id": "W1",
+                    "pos_id": "POS-03",
+                    "cashier": "Emily Rodriguez"
+                },
+                {
+                    "cam_id": "CAM-02",
+                    "window_id": "W2",
+                    "pos_id": "POS-04",
+                    "cashier": "James Williams"
+                }
+            ]
+        },
+        {
+            "store_id": "STR002",
+            "lanes": [
+                {
+                    "cam_id": "CAM-01",
+                    "window_id": "W1",
+                    "pos_id": "POS-01",
+                    "cashier": "Sarah Johnson"
+                },
+                {
+                    "cam_id": "CAM-01",
+                    "window_id": "W2",
+                    "pos_id": "POS-02",
+                    "cashier": "Michael Chen"
+                },
+                {
+                    "cam_id": "CAM-02",
+                    "window_id": "W1",
+                    "pos_id": "POS-03",
+                    "cashier": "Emily Rodriguez"
+                },
+                {
+                    "cam_id": "CAM-02",
+                    "window_id": "W2",
+                    "pos_id": "POS-04",
+                    "cashier": "James Williams"
+                }
+            ]
+        },
+        {
+            "store_id": "STR003",
+            "lanes": [
+                {
+                    "cam_id": "CAM-01",
+                    "window_id": "W1",
+                    "pos_id": "POS-01",
+                    "cashier": "Sarah Johnson"
+                },
+                {
+                    "cam_id": "CAM-01",
+                    "window_id": "W2",
+                    "pos_id": "POS-02",
+                    "cashier": "Michael Chen"
+                },
+                {
+                    "cam_id": "CAM-02",
+                    "window_id": "W1",
+                    "pos_id": "POS-03",
+                    "cashier": "Emily Rodriguez"
+                },
+                {
+                    "cam_id": "CAM-02",
+                    "window_id": "W2",
+                    "pos_id": "POS-04",
+                    "cashier": "James Williams"
+                }
+            ]
+        }
+    ]
+}

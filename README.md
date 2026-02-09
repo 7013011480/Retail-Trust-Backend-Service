@@ -48,7 +48,17 @@ This is the backend service for the Retail Trust & Security Dashboard. It is a F
     The service will be available at `http://localhost:8000`.
     The WebSocket endpoint is available at `ws://localhost:8000/ws`.
 
+3.  **Activate the redis server**:
+    ```bash
+    brew services start redis
+    ```
+
 ## API Documentation
 
 - **Swagger UI**: Visit `http://localhost:8000/docs` for interactive API documentation.
 - **ReDoc**: Visit `http://localhost:8000/redoc` for alternative documentation.
+
+
+https://integrations.fnb.posifly.in/v1/sales/getSalesWithItems
+
+X-Nukkad-API-Token:  Zf
