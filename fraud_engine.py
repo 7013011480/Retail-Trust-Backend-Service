@@ -6,6 +6,7 @@ import time
 from datetime import datetime
 from typing import Dict, Optional, List, Callable
 from models import VASEvent, POSEvent, Transaction, Alert, TransactionStatus, AlertStatus, TransactionMode
+from utils import acquire_file_lock
 
 # File Constants
 POS_DATA_FILE = "pos_data.json"
@@ -260,13 +261,23 @@ class FraudEngine:
         try:
             if not os.path.exists(VAS_DATA_FILE): return
             
-            with open(VAS_DATA_FILE, "r") as f:
-                items = json.loads(f.read())
-            
-            new_items = [i for i in items if i.get("SessionId") != vas.SessionId]
-            
-            with open(VAS_DATA_FILE, "w") as f:
-                json.dump(new_items, f, indent=4)
+            print(f"[FraudEngine] Acquiring lock to remove VAS {vas.SessionId}")
+            with acquire_file_lock(VAS_DATA_FILE):
+                with open(VAS_DATA_FILE, "r") as f:
+                    items = json.loads(f.read())
+                
+                # Check if it even exists currently (handling user deletion)
+                exists = any(i.get("SessionId") == vas.SessionId for i in items)
+                if not exists:
+                    print(f"[FraudEngine] VAS {vas.SessionId} already removed (by User/Other).")
+                    return # Do nothing, to avoid overwriting user changes? 
+                           # Actually, if we just write back 'items' we do nothing.
+                           # But we want to remove it.
+                
+                new_items = [i for i in items if i.get("SessionId") != vas.SessionId]
+                
+                with open(VAS_DATA_FILE, "w") as f:
+                    json.dump(new_items, f, indent=4)
             print(f"[FraudEngine] Removed VAS {vas.SessionId} from {VAS_DATA_FILE}")
             
         except Exception as e:

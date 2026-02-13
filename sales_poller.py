@@ -6,6 +6,7 @@ import logging
 from datetime import datetime, timedelta
 import os
 import redis
+import truststore
 
 class SalesPoller:
     def __init__(self, file_lock: asyncio.Lock = None, storage_path: str = "pos_data.json"):
@@ -39,7 +40,7 @@ class SalesPoller:
         """Fetches sales data from the API."""
         now = datetime.now()
         to_time = int(now.timestamp())
-        from_time = int((now - timedelta(minutes=120)).timestamp())
+        from_time = int((now - timedelta(minutes=2)).timestamp())
 
         payload = {
             "cin": self.cin,
@@ -51,6 +52,7 @@ class SalesPoller:
         print(f"[{datetime.now()}] Polling sales data from {from_time} to {to_time}...")
         
         try:
+            ctx = truststore.SSLContext(verify=ctx)
             async with httpx.AsyncClient() as client:
                 response = await client.post(self.api_url, headers=self.headers, json=payload)
                 
@@ -156,7 +158,7 @@ class SalesPoller:
                 json.dump(final_list, f, indent=4)
             print(f"Added {added_count} new bills to {self.output_file}")
 
-    async def start_polling(self, interval_seconds: int = 60):
+    async def start_polling(self, interval_seconds: int = 120):
         """Starts the polling loop."""
         while True:
             await self.fetch_sales()

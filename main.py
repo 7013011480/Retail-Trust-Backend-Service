@@ -119,7 +119,7 @@ async def file_orchestrator():
 async def startup_event():
     # Start the sales polling loop in background
     poller = SalesPoller(file_lock=pos_lock, storage_path=pos_file_path)
-    asyncio.create_task(poller.start_polling(interval_seconds=60))
+    asyncio.create_task(poller.start_polling())
     
     # Start file orchestrator
     asyncio.create_task(file_orchestrator())
