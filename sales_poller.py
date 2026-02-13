@@ -11,7 +11,7 @@ class SalesPoller:
     def __init__(self, output_file: str = "sales_data.json"):
         self.output_file = output_file
         self.api_url = "https://openapis.nukkadshops.com/v1/sales/getSalesWithItems"
-        self.headers = {"X-Nukkad-API-Token": "j6RzQe7rZyyM3McZXD8gZD2XNj8vKfuf"}
+        self.headers = {"X-Nukkad-API-Token": ""}
         self.cin = "NSCIN8227" # User should replace this
         self.redis_client = redis.Redis(host='localhost', port=6379, db=0, decode_responses=True)
         self.stream_key = "sales_stream"
