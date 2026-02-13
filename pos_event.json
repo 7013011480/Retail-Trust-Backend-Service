@@ -1,0 +1,14 @@
+[
+    {
+        "StoreId": "STR001",
+        "CashierName": "Alice",
+        "POSId": "POS01",
+        "SellerWindowId": "WIN01",
+        "BillDate": "2023-10-27",
+        "SessionTime": 1050.0,
+        "ModeOfTransaction": "Cash",
+        "TransactionTotal": 100.0,
+        "DiscountPercent": 0.0,
+        "RefundAmount": 0.0
+    }
+]

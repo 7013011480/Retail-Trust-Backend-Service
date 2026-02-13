@@ -11,10 +11,29 @@ class SalesPoller:
     def __init__(self, file_lock: asyncio.Lock = None, storage_path: str = "pos_data.json"):
         self.output_file = storage_path
         self.file_lock = file_lock
-        self.api_url = "https://openapis.nukkadshops.com/v1/sales/getSalesWithItems"
-        self.headers = {"X-Nukkad-API-Token": "j6RzQe7rZyyM3McZXD8gZD2XNj8vKfuf"}
-        self.cin = "NSCIN8227" # User should replace this
+        
+        # Load config from env
+        from dotenv import load_dotenv
+        load_dotenv()
+        
+        self.api_url = os.getenv("EXTERNAL_SALES_URL")
+        token = os.getenv("EXTERNAL_SALES_HEADER_TOKEN")
+        self.headers = {"X-Nukkad-API-Token": token}
+        self.cin = "NSCIN1223" # User should replace this
+        self.mapping = {}
+        self._load_mapping()
         # Redis removed
+
+    def _load_mapping(self):
+        try:
+            if os.path.exists("mapping.json"):
+                with open("mapping.json", "r") as f:
+                    self.mapping = json.load(f)
+                    print(f"Loaded {len(self.mapping)} mappings.")
+            else:
+                print("mapping.json not found.")
+        except Exception as e:
+            print(f"Error loading mapping.json: {e}")
 
     async def fetch_sales(self):
         """Fetches sales data from the API."""
@@ -54,7 +73,7 @@ class SalesPoller:
         for bill in bills:
             try:
                 # Extract required fields with safety checks
-                cashier_details = bill.get("cashierDetails", {})
+                # cashier_details = bill.get("cashierDetails", {})
                 pay_modes = bill.get("payModes", [])
                 payment_mode = pay_modes[0].get("mode") if pay_modes else "Unknown"
                 
@@ -71,17 +90,25 @@ class SalesPoller:
                         pass
 
                 # Extract amount - trying standard fields, default 0
-                total_amount = float(bill.get("netAmount", 0.0))
+                total_amount = float(bill.get("actualBillAmt", 0.0))
+                
+                store_id = bill.get("ndcin", self.cin)
+                pos_id = bill.get("terminalName", "Unknown")
+                
+                # Resolve SellerWindowId from mapping
+                mapping_key = f"{store_id}_{pos_id}"
+                seller_window_id = self.mapping.get(mapping_key, "Unknown")
                 
                 # Create POSEvent dict
                 event = {
-                    "StoreId": bill.get("nscin", self.cin),
-                    "CashierName": cashier_details.get("cashierName", "Unknown"),
-                    "POSId": bill.get("terminalNo", "Unknown"),
+                    "StoreId": store_id,
+                    "CashierName": bill.get("cashierName", "Unknown"),
+                    "POSId": pos_id,
+                    "SellerWindowId": seller_window_id,
                     "BillDate": bill_date,
                     "SessionTime": session_time,
                     "ModeOfTransaction": payment_mode,
-                    "TransactionTotal": total_amount, # API might not return this here, assuming 0 if not found
+                    "TransactionTotal": total_amount,  # API might not return this here, assuming 0 if not found
                     "DiscountPercent": 0.0,
                     "RefundAmount": 0.0,
                     

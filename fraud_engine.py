@@ -1,174 +1,166 @@
 import asyncio
-from datetime import datetime, timedelta
+import json
+import os
+import uuid
+import time
+from datetime import datetime
 from typing import Dict, Optional, List, Callable
 from models import VASEvent, POSEvent, Transaction, Alert, TransactionStatus, AlertStatus, TransactionMode
 
+# File Constants
+POS_DATA_FILE = "pos_data.json"
+VAS_DATA_FILE = "vas_data.json"
+SALES_DATA_FILE = "pos_event.json"
+VAS_EVENTS_FILE = "vas_event.json"
+
 class FraudEngine:
-    def __init__(self, update_callback: Callable):
+    def __init__(self, update_callback: Callable, pos_lock: asyncio.Lock):
         self.update_callback = update_callback
-        # Mapping SellerWindowId -> POSId
-        # In a real app this would be in a DB
-        self.mapping = {}
-        stores = ["STR001", "STR002", "STR003", "NSCIN8227"]
-        lanes = [
-            {"cam_id": "CAM-01", "window_id": "W1", "pos_id": "POS-01"},
-            {"cam_id": "CAM-01", "window_id": "W2", "pos_id": "POS-02"},
-            {"cam_id": "CAM-02", "window_id": "W1", "pos_id": "POS-03"},
-            {"cam_id": "CAM-02", "window_id": "W2", "pos_id": "POS4"}, # Updated to match sales_data.json
-        ]
-        
-        # Consistent mapping generation matching StreamSimulator
-        # Note: POS IDs in simulator are static per lane, but here we might need unique POS IDs per store?
-        # The simulator uses: "pos_id": "POS-01" for lane 1 regardless of store.
-        # This implies POS-01 exists in STR001, POS-01 exists in STR002, etc. (Which is weird but let's stick to simulator logic)
-        # Simulator: 
-        # return store, lane, seller_window_id
-        # pos_event has POSId=lane["pos_id"]
-        # So POS-01 is used for STR001, STR002, etc.
-        # We need to map SellerWindowId -> POSId.
-        
-        for store in stores:
-            for lane in lanes:
-                seller_window_id = f"{store}_{lane['cam_id']}_{lane['window_id']}"
-                self.mapping[seller_window_id] = lane['pos_id']
-        # Buffer for events waiting for their pair
-        self.pending_vas: Dict[str, VASEvent] = {} # Key: SellerWindowId
-        self.pending_pos: Dict[str, POSEvent] = {} # Key: POSId
-        
-        # Mapping for reverse lookup: POSId -> (CamId, WindowId)
-        self.pos_config = {}
-        for lane in lanes:
-            self.pos_config[lane['pos_id']] = (lane['cam_id'], lane['window_id'])
+        self.pos_lock = pos_lock
+        self.active_tasks: Dict[str, asyncio.Task] = {} # Track active VAS tasks by SessionId
 
-        # Buffer for events waiting for their pair
-        self.pending_vas: Dict[str, VASEvent] = {} # Key: SellerWindowId
-        self.pending_pos: Dict[str, POSEvent] = {} # Key: POSId
+    async def handle_vas_event(self, vas_event: VASEvent):
+        """
+        Entry point for a new VAS event. 
+        Spawns a background task to manage the lifecycle of this event.
+        """
+        session_id = vas_event.SessionId
+        print(f"[FraudEngine] Received VAS Event: {session_id} (Window: {vas_event.SellerWindowId})")
         
-    async def process_vas(self, event: VASEvent):
-        seller_window_id = event.SellerWindowId
-        # Look up expected POS ID from mapping
-        expected_pos_id = self.mapping.get(seller_window_id)
-        
-        if not expected_pos_id:
-            print(f"Unknown mapping for {seller_window_id}")
+        # Avoid duplicate tasks for the same session
+        if session_id in self.active_tasks:
+            # print(f"[FraudEngine] Task already active for {session_id}, skipping.")
             return
 
-        # Check if POS event is already waiting
-        # Note: POS event key in pending_pos currently uses just POSId. 
-        # But since POSId might be shared across stores, we should probably key by StoreId_POSId?
-        # Let's adjust pending_pos key to be unique: f"{event.StoreId}_{expected_pos_id}"
+        # Create background task
+        task = asyncio.create_task(self._process_vas_lifecycle(vas_event))
+        self.active_tasks[session_id] = task
         
-        pos_key = f"{event.StoreId}_{expected_pos_id}"
-        
-        if pos_key in self.pending_pos:
-            pos_event = self.pending_pos.pop(pos_key)
-            await self._analyze_pair(event, pos_event)
-        else:
-            # Store and wait
-            self.pending_vas[seller_window_id] = event
-            asyncio.create_task(self._check_timeout(seller_window_id, event))
+        # Cleanup task when done
+        task.add_done_callback(lambda t: self.active_tasks.pop(session_id, None))
 
-    async def process_pos(self, event: POSEvent):
-        pos_id = event.POSId
-        store_id = event.StoreId
-        
-        # Resolve SellerWindowId from POS data
-        if pos_id not in self.pos_config:
-            print(f"Unknown POS configuration for {pos_id}")
-            return
+    async def _process_vas_lifecycle(self, vas_event: VASEvent):
+        """
+        Manages the lifecycle of a VAS event:
+        1. Check for match immediately.
+        2. If not found, wait 4 minutes.
+        3. Check again.
+        4. If found -> Validate & Move.
+        5. If not found -> Raise Alert.
+        """
+        try:
+            # 1. First Check
+            print(f"[FraudEngine] {vas_event.SessionId}: Initial check for POS match...")
+            match = await self._find_pos_match(vas_event)
             
-        cam_id, window_id = self.pos_config[pos_id]
-        expected_seller_window_id = f"{store_id}_{cam_id}_{window_id}"
+            if match:
+                print(f"[FraudEngine] {vas_event.SessionId}: Match found immediately!")
+                await self._execute_judgment(vas_event, match)
+                return
+
+            # 2. Wait (4 minutes)
+            print(f"[FraudEngine] {vas_event.SessionId}: No match found. Waiting 4 minutes...")
+            await asyncio.sleep(240) 
+
+            # 3. Second Check
+            print(f"[FraudEngine] {vas_event.SessionId}: Retry check after wait...")
+            match = await self._find_pos_match(vas_event)
+
+            if match:
+                print(f"[FraudEngine] {vas_event.SessionId}: Match found after wait!")
+                await self._execute_judgment(vas_event, match)
+                return
+
+            # 4. Final: No match found
+            print(f"[FraudEngine] {vas_event.SessionId}: Still no match. Raising alert.")
+            await self._raise_missing_alert(vas_event)
+
+        except Exception as e:
+            print(f"[FraudEngine] Error in lifecycle for {vas_event.SessionId}: {e}")
+
+    async def _find_pos_match(self, vas_event: VASEvent) -> Optional[POSEvent]:
+        """
+        Reads POS data and looks for a match based on SellerWindowId and Time.
+        Condition: vas.SessionStart <= pos.SessionTime <= vas.SessionEnd
+        """
+        pos_data_list = []
+        async with self.pos_lock:
+            if os.path.exists(POS_DATA_FILE):
+                try:
+                    with open(POS_DATA_FILE, "r") as f:
+                        content = f.read()
+                        if content:
+                            pos_data_list = json.loads(content)
+                except Exception as e:
+                    print(f"[FraudEngine] Error reading POS file: {e}")
+                    return None
+
+        # Filter for logic
+        candidates = []
+        for p in pos_data_list:
+            # Check SellerWindowId
+            p_window = p.get("SellerWindowId")
+            if p_window != vas_event.SellerWindowId:
+                continue
+
+            # Check Time
+            p_time = p.get("SessionTime", 0)
+            if vas_event.SessionStart <= p_time <= vas_event.SessionEnd:
+                candidates.append(p)
+
+        if not candidates:
+            return None
         
-        # Check if VAS event is already waiting
-        if expected_seller_window_id in self.pending_vas:
-            vas_event = self.pending_vas.pop(expected_seller_window_id)
-            await self._analyze_pair(vas_event, event)
-        else:
-            # Store with unique key combining Store and POS
-            pos_key = f"{store_id}_{pos_id}"
-            self.pending_pos[pos_key] = event
-            asyncio.create_task(self._cleanup_pos(pos_key))
+        # If multiple matches, we might need logic? User said "if found more than one event, then compare the timeframes"
+        # We already compared timeframes. 
+        # For now, pick the first valid one.
+        if len(candidates) > 1:
+            print(f"[FraudEngine] Warning: Multiple POS matches for {vas_event.SessionId}. Picking first.")
 
-    async def _cleanup_pos(self, pos_key: str): # Updated signature
-        await asyncio.sleep(30)
-        if pos_key in self.pending_pos:
-            del self.pending_pos[pos_key]
+        return POSEvent(**candidates[0])
 
-    async def _check_timeout(self, seller_window_id: str, vas_event: VASEvent):
-        # Wait for 120 seconds (2 mins) to see if POS arrives as per High Severity Rule
-        await asyncio.sleep(120) 
-        
-        # If still in pending, it means POS never arrived
-        if seller_window_id in self.pending_vas and self.pending_vas[seller_window_id] == vas_event:
-            del self.pending_vas[seller_window_id]
-            
-            # Application Logic: Receipt generated but POS missing
-            # Only if receipt was actually generated (or supposedly generated)
-            if vas_event.ReceiptGenerationStatus:
-                await self._create_fraud_alert(
-                    vas=vas_event, 
-                    pos=None, 
-                    rules=["Corresponding object is not present in VAS for POS and vise versa"],
-                    risk_level="High"
-                )
-
-    async def _cleanup_pos(self, pos_key: str):
-        # Increased cleanup time to match timeout window + buffer
-        await asyncio.sleep(150)
-        if pos_key in self.pending_pos:
-            del self.pending_pos[pos_key]
-            # TODO: Handle Case: POS exists, VAS missing? (Vice versa rule)
-            # For now, just cleaning up. The vice versa rule implies we should check here too.
-            # But let's stick to the primary flow for now to keep it simple unless specified.
-
-    async def _analyze_pair(self, vas: VASEvent, pos: POSEvent):
-        # We have both. Check for consistency.
+    async def _execute_judgment(self, vas: VASEvent, pos: POSEvent):
+        """
+        Validates the pair, sends to dashboard, and moves data to processed files.
+        """
         triggered_rules = []
         risk_level = "Low"
 
-        # Rule 1: Payment Mode Mismatch (High)
-        if vas.ModeOfTransaction != pos.ModeOfTransaction:
-            triggered_rules.append(f"Payment Mode Mismatch (VAS: {vas.ModeOfTransaction.value}, POS: {pos.ModeOfTransaction.value})")
+        # Rule 1: Payment Mode Mismatch
+        vas_mode = str(vas.ModeOfTransaction.value).lower()
+        pos_mode = str(pos.ModeOfTransaction).lower()
+        
+        if vas_mode != pos_mode:
+            triggered_rules.append(f"Payment Mode Mismatch (VAS: {vas.ModeOfTransaction.value}, POS: {pos.ModeOfTransaction})")
 
-        # Rule 2: Bill not generated (Medium)
+        # Rule 2: Bill not generated
         if not vas.ReceiptGenerationStatus:
             triggered_rules.append("Bill not generated in VAS")
 
-        # Rule 3: High Discount (Medium)
-        if hasattr(pos, 'DiscountPercent') and pos.DiscountPercent > 20:
+        # Rule 3: High Discount
+        if pos.DiscountPercent > 20:
              triggered_rules.append(f"High Discount ({pos.DiscountPercent}%)")
 
-        # Rule 4: Refund (Medium)
-        if hasattr(pos, 'RefundAmount') and pos.RefundAmount > 0:
-            triggered_rules.append(f"Refund Processed (${pos.RefundAmount})")
+        # Rule 4: Refund
+        if pos.RefundAmount > 0:
+            triggered_rules.append(f"Refund Processed ({pos.RefundAmount})")
 
-        # Determine Risk Level
+        # Determine Risk
         if any("Mismatch" in r for r in triggered_rules):
             risk_level = "High"
         elif any("Bill not generated" in r for r in triggered_rules): 
-            # Note: User said Medium, but logic might dictate higher if no receipt? 
-            # User specified Medium.
-            if risk_level != "High":
-                risk_level = "Medium"
-        elif triggered_rules: # Any other rules (Discount, Refund)
-             if risk_level != "High":
-                risk_level = "Medium"
-        
-        # Additional check for High Severity "Vice Versa" rule is implicitly handled if one is missing (handled in timeout).
-        # This function runs when BOTH match. 
+            risk_level = "Medium"
+        elif triggered_rules:
+             risk_level = "Medium"
 
-        status = TransactionStatus.PENDING
-        if risk_level == "High":
-            status = TransactionStatus.FRAUDULENT
-        elif risk_level == "Medium":
-            status = TransactionStatus.SUSPICIOUS
-        else:
-            status = TransactionStatus.GENUINE
+        status = TransactionStatus.GENUINE
+        if risk_level == "High": status = TransactionStatus.FRAUDULENT
+        elif risk_level == "Medium": status = TransactionStatus.SUSPICIOUS
 
-        # Create Transaction Record
+        # Create Transaction
+        transaction_id = f"TXN-{vas.SessionId}"
         transaction = Transaction(
-            id=f"TXN-{vas.SessionId}",
+            id=transaction_id,
             shop_id=vas.StoreId,
             cam_id=vas.CamId,
             pos_id=pos.POSId,
@@ -182,33 +174,45 @@ class FraudEngine:
             notes=", ".join(triggered_rules) if triggered_rules else None
         )
 
+        # Send to Dashboard
         await self.update_callback("NEW_TRANSACTION", transaction)
-
-        # If High or Medium risk, trigger Alert (or just High?)
-        # Let's trigger for both High and Medium to be safe/visible
+        
         if risk_level in ["High", "Medium"]:
-             await self._create_fraud_alert(vas, pos, triggered_rules, risk_level, transaction_id=transaction.id)
+             await self._create_alert(vas, pos, triggered_rules, risk_level, transaction_id)
 
-    async def _create_fraud_alert(self, vas: VASEvent, pos: Optional[POSEvent], rules: List[str], risk_level: str, transaction_id: str = None):
-        if not transaction_id:
-            transaction_id = f"TXN-{vas.SessionId}"
-            # Dummy transaction for phantom scan
-            transaction = Transaction(
-                id=transaction_id,
-                shop_id=vas.StoreId,
-                cam_id=vas.CamId,
-                pos_id=self.mapping.get(vas.SellerWindowId, "Unknown"),
-                cashier_name="Unknown", 
-                timestamp=datetime.fromtimestamp(vas.SessionEnd),
-                transaction_total=0.0,
-                risk_level=risk_level,
-                triggered_rules=rules,
-                status=TransactionStatus.FRAUDULENT,
-                fraud_category=rules[0],
-                notes="; ".join(rules)
-            )
-            await self.update_callback("NEW_TRANSACTION", transaction)
+        # Move Data
+        await self._move_data_processed(vas, pos)
 
+    async def _raise_missing_alert(self, vas: VASEvent):
+        """
+        Raised when VAS exists but no POS found after timeout.
+        """
+        triggered_rules = ["Corresponding object is not present in VAS for POS and vise versa"]
+        risk_level = "High"
+        
+        # Create Phantom Transaction for display
+        transaction_id = f"TXN-{vas.SessionId}-MISSING"
+        transaction = Transaction(
+            id=transaction_id,
+            shop_id=vas.StoreId,
+            cam_id=vas.CamId,
+            pos_id="Unknown", 
+            cashier_name="Unknown", 
+            timestamp=datetime.fromtimestamp(vas.SessionEnd),
+            transaction_total=0.0,
+            risk_level=risk_level,
+            triggered_rules=triggered_rules,
+            status=TransactionStatus.FRAUDULENT,
+            fraud_category=triggered_rules[0],
+            notes="POS Data Missing"
+        )
+        await self.update_callback("NEW_TRANSACTION", transaction)
+        await self._create_alert(vas, None, triggered_rules, risk_level, transaction_id)
+        
+        # Remove from pending
+        await self._remove_vas_event(vas)
+
+    async def _create_alert(self, vas: VASEvent, pos: Optional[POSEvent], rules: List[str], risk_level: str, transaction_id: str):
         alert = Alert(
             id=f"ALT-{uuid.uuid4().hex[:6].upper()}",
             transaction_id=transaction_id,
@@ -220,87 +224,76 @@ class FraudEngine:
             status=AlertStatus.NEW
         )
         await self.update_callback("NEW_ALERT", alert)
-        
-    async def process_vas_with_lookup(self, vas_event: VASEvent, pos_list: List[dict]) -> Optional[dict]:
-        """
-        Process VAS event and look for its pair in the provided POS list.
-        Returns the matched POS event dict if found, None otherwise.
-        """
-        seller_window_id = vas_event.SellerWindowId
-        expected_pos_id = self.mapping.get(seller_window_id)
-        
-        if not expected_pos_id:
-            # print(f"Unknown mapping for {seller_window_id}")
-            # Still process if we want to handle unknown mappings, but for now return None.
-            pass
 
-        # Search in pos_list
-        matched_pos_data = None
-        for pos_data in pos_list:
-            # Check for generic match or specific Store/POS match
-            # pos_data keys might be CamelCase if loaded via SalesPoller logic above, or raw?
-            # SalesPoller creates dict with StoreId, POSId etc.
-            p_store = pos_data.get("StoreId")
-            p_id = pos_data.get("POSId")
+    async def _move_data_processed(self, vas: VASEvent, pos: POSEvent):
+        """
+        Moves matched events to processed files.
+        """
+        # 1. Append to Archive Files
+        await self._append_to_file(VAS_EVENTS_FILE, vas.model_dump())
+        await self._append_to_file(SALES_DATA_FILE, pos.model_dump())
+
+        # 2. Remove from Source Files
+        await self._remove_vas_event(vas)
+        await self._remove_pos_event(pos)
+
+    async def _append_to_file(self, filename: str, data: dict):
+        # Simple append, no lock? Ideally lock if multiple writers.
+        # Assuming we are single writer (FraudEngine) for archives.
+        try:
+            items = []
+            if os.path.exists(filename):
+                try:
+                    with open(filename, "r") as f:
+                        content = f.read()
+                        if content: items = json.loads(content)
+                except: pass
             
-            # Simple match condition: Store and POS ID match
-            # And maybe time window? (Within X minutes)
-            # For now strict ID match + Time check (e.g. +/- 5 mins)
-            if p_store == vas_event.StoreId and p_id == expected_pos_id:
-                # Check time
-                p_time = pos_data.get("SessionTime", 0)
-                v_time = vas_event.SessionEnd
-                if abs(p_time - v_time) < 300: # 5 mins tolerance
-                    matched_pos_data = pos_data
-                    break
-        
-        if matched_pos_data:
-            # Convert dict to POSEvent
-            pos_event = POSEvent(**matched_pos_data)
-            await self._analyze_pair(vas_event, pos_event)
-            return matched_pos_data
-        else:
-            # Store in pending
-            self.pending_vas[seller_window_id] = vas_event
-            # Start timeout check (if we want to clean up eventually)
-            asyncio.create_task(self._check_timeout(seller_window_id, vas_event))
-            return None
+            items.append(data)
+            
+            with open(filename, "w") as f:
+                json.dump(items, f, indent=4)
+        except Exception as e:
+            print(f"[FraudEngine] Error appending to {filename}: {e}")
 
-    async def match_pending_vas(self, pos_list: List[dict]) -> List[dict]:
-        """
-        Checks pending VAS events against the current POS list.
-        Returns list of matched POS events to be removed from the file.
-        """
-        matched_to_remove = []
-        
-        # Iterate over a copy of keys since we might modify pending_vas
-        for seller_window_id, vas_event in list(self.pending_vas.items()):
-             expected_pos_id = self.mapping.get(seller_window_id)
-             if not expected_pos_id:
-                 continue
-                 
-             for pos_data in pos_list:
-                if pos_data in matched_to_remove:
-                    continue
-                    
-                p_store = pos_data.get("StoreId")
-                p_id = pos_data.get("POSId")
+    async def _remove_vas_event(self, vas: VASEvent):
+        try:
+            if not os.path.exists(VAS_DATA_FILE): return
+            
+            with open(VAS_DATA_FILE, "r") as f:
+                items = json.loads(f.read())
+            
+            new_items = [i for i in items if i.get("SessionId") != vas.SessionId]
+            
+            with open(VAS_DATA_FILE, "w") as f:
+                json.dump(new_items, f, indent=4)
+            print(f"[FraudEngine] Removed VAS {vas.SessionId} from {VAS_DATA_FILE}")
+            
+        except Exception as e:
+            print(f"[FraudEngine] Error removing VAS {vas.SessionId}: {e}")
+
+    async def _remove_pos_event(self, pos: POSEvent):
+        async with self.pos_lock:
+            try:
+                if not os.path.exists(POS_DATA_FILE): return
+
+                with open(POS_DATA_FILE, "r") as f:
+                    items = json.loads(f.read())
                 
-                if p_store == vas_event.StoreId and p_id == expected_pos_id:
-                    p_time = pos_data.get("SessionTime", 0)
-                    v_time = vas_event.SessionEnd
-                    if abs(p_time - v_time) < 300:
-                        # Match found!
-                        pos_event = POSEvent(**pos_data)
-                        await self._analyze_pair(vas_event, pos_event)
-                        
-                        # Remove from pending
-                        if seller_window_id in self.pending_vas:
-                            del self.pending_vas[seller_window_id]
-                        
-                        matched_to_remove.append(pos_data)
-                        break
-        
-        return matched_to_remove
+                new_items = []
+                removed = False
+                for item in items:
+                    if not removed and \
+                       item.get("StoreId") == pos.StoreId and \
+                       item.get("POSId") == pos.POSId and \
+                       item.get("SessionTime") == pos.SessionTime:
+                        removed = True
+                        continue
+                    new_items.append(item)
+                
+                with open(POS_DATA_FILE, "w") as f:
+                    json.dump(new_items, f, indent=4)
+                print(f"[FraudEngine] Removed POS {pos.POSId} from {POS_DATA_FILE}")
 
-import uuid
+            except Exception as e:
+                print(f"[FraudEngine] Error removing POS {pos.POSId}: {e}")

@@ -39,6 +39,7 @@ class POSEvent(BaseModel):
     StoreId: str
     CashierName: str
     POSId: str
+    SellerWindowId: Optional[str] = None
     BillDate: str
     SessionTime: float
     ModeOfTransaction: str # Changed from enum to str to be more flexible with "Phonepe" etc.
