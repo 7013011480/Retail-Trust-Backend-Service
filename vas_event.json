@@ -1,46 +1,24 @@
 [
     {
-        "StoreId": "NSCIN8227",
-        "CamId": "CAM-02",
-        "SellerWindowId": "NSCIN8227_CAM-02_W2",
-        "SessionId": "VAS-aee96fff",
-        "BillDate": "2026-02-09",
-        "SessionStart": 1770629379.151081,
-        "SessionEnd": 1770629473.0,
-        "ModeOfTransaction": "Phonepe",
+        "StoreId": "STORE_001",
+        "CamId": "CAM_01",
+        "SellerWindowId": "WIN_01",
+        "SessionId": "SESSION_MISSING",
+        "BillDate": "2026-02-16",
+        "SessionStart": 1771223951.472409,
+        "SessionEnd": 1771224011.472409,
+        "ModeOfTransaction": "Card",
         "ReceiptGenerationStatus": true
     },
     {
-        "StoreId": "NSCIN8227",
-        "CamId": "CAM-02",
-        "SellerWindowId": "NSCIN8227_CAM-02_W2",
-        "SessionId": "VAS-a329b109",
-        "BillDate": "2026-02-09",
-        "SessionStart": 1770629975.5016665,
-        "SessionEnd": 1770630018.0,
-        "ModeOfTransaction": "Cash",
-        "ReceiptGenerationStatus": true
-    },
-    {
-        "StoreId": "NSCIN8227",
-        "CamId": "CAM-02",
-        "SellerWindowId": "NSCIN8227_CAM-02_W2",
-        "SessionId": "VAS-d46fce51",
-        "BillDate": "2026-02-09",
-        "SessionStart": 1770633579.9202733,
-        "SessionEnd": 1770633642.0,
-        "ModeOfTransaction": "Phonepe",
-        "ReceiptGenerationStatus": true
-    },
-    {
-        "StoreId": "NSCIN8227",
-        "CamId": "CAM-02",
-        "SellerWindowId": "NSCIN8227_CAM-02_W2",
-        "SessionId": "VAS-d34803b7",
-        "BillDate": "2026-02-09",
-        "SessionStart": 1770634804.4760408,
-        "SessionEnd": 1770634853.0,
-        "ModeOfTransaction": "Phonepe",
+        "StoreId": "STORE_001",
+        "CamId": "CAM_01",
+        "SellerWindowId": "WIN_01",
+        "SessionId": "VAS_ORPHAN",
+        "BillDate": "2026-02-16",
+        "SessionStart": 1771225265.024789,
+        "SessionEnd": 1771225325.024789,
+        "ModeOfTransaction": "Card",
         "ReceiptGenerationStatus": true
     }
 ]

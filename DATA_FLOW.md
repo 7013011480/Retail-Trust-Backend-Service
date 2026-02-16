@@ -37,17 +37,18 @@ This document outlines the complete flow of data from ingestion to fraud analysi
 
 The system links VAS and POS events to create a "Transaction Pair" for analysis.
 
-*   **Mechanism**: Direct String Matching.
-*   **Key**: `SellerWindowId`.
+*   **Mechanism**: **Scheduled Batch Processing**.
+*   **Key**: `SellerWindowId` + `SessionTime`.
 *   **Process**:
-    1.  **VAS Arrival**: A VAS event arrives and waits in a buffer.
-    2.  **POS Arrival**: A POS event is fetched. `SalesPoller` calculates its `SellerWindowId` using `mapping.json`.
-    3.  **Comparison**: The Orchestrator compares:
-        ```python
-        if pos_event.SellerWindowId == vas_event.SellerWindowId:
-            # Match Found!
-        ```
-    4.  **Result**: If matched, the pair is sent to the **Fraud Engine**.
+    1.  **Ingestion**: VAS and POS events are written to `vas_data.json` and `pos_data.json` respectively.
+    2.  **Scheduler**: A background task wakes up every **2 minutes**.
+    3.  **VAS Processing**: 
+        - The `FraudEngine` reads all pending VAS events.
+        - For each VAS event, it searches `pos_data.json` for a match (same Window, time overlapping).
+    4.  **POS Processing**:
+        - The `FraudEngine` reads all pending POS events.
+        - For each POS event, it searches `vas_data.json` for a match.
+    5.  **Result**: If matched, the pair is validated and processed immediately.
 
 ---
 
@@ -65,12 +66,13 @@ Once matched, the `FraudEngine` compares parameters between the VAS object and t
 | **Refunds** | *N/A* | `RefundAmount` | `pos.RefundAmount > 0` | **Medium** |
 
 ### Missing Event Logic (Phantom Scan)
-*   **Scenario**: VAS Event arrives, but no matching POS event arrives within timeout (120s).
+*   **Scenario**: Event (VAS or POS) exists in the file for more than **2 minutes** without a match.
 *   **Logic**:
-    ```python
-    if timeout_reached and vas_event_pending:
-        Trigger Alert("Corresponding object is not present in VAS for POS and vise versa")
-    ```
+    - During the batch run, if an event's timestamp is older than 2 minutes and no counterpart is found:
+    - **Action 1**: Create a "Missing Data" Transaction (Risk: High).
+    - **Action 2**: Trigger an Alert.
+    - **Action 3**: Archive the event to `vas_event.json` or `pos_event.json`.
+    - **Action 4**: Remove the event from the source file.
 *   **Risk Level**: **High**.
 
 ---

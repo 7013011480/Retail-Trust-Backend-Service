@@ -2,11 +2,10 @@ import asyncio
 import json
 import os
 import uuid
-import time
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Dict, Optional, List, Callable
 from models import VASEvent, POSEvent, Transaction, Alert, TransactionStatus, AlertStatus, TransactionMode
-from utils import acquire_file_lock
+# from utils import acquire_file_lock
 
 # File Constants
 POS_DATA_FILE = "pos_data.json"
@@ -18,107 +17,135 @@ class FraudEngine:
     def __init__(self, update_callback: Callable, pos_lock: asyncio.Lock):
         self.update_callback = update_callback
         self.pos_lock = pos_lock
-        self.active_tasks: Dict[str, asyncio.Task] = {} # Track active VAS tasks by SessionId
 
-    async def handle_vas_event(self, vas_event: VASEvent):
+    async def run_vas_batch_process(self):
         """
-        Entry point for a new VAS event. 
-        Spawns a background task to manage the lifecycle of this event.
+        Process all pending VAS events:
+        1. Read VAS data.
+        2. For each event, check for POS match.
+        3. If match found -> Validate & Move.
+        4. If not found:
+           - If older than 2 mins -> Raise Alert (Missing POS) & Move.
+           - If recent -> Skip (wait for next cycle).
         """
-        session_id = vas_event.SessionId
-        print(f"[FraudEngine] Received VAS Event: {session_id} (Window: {vas_event.SellerWindowId})")
+        print("[FraudEngine] Starting VAS Batch Process...")
+        vas_events = await self._read_vas_file()
         
-        # Avoid duplicate tasks for the same session
-        if session_id in self.active_tasks:
-            # print(f"[FraudEngine] Task already active for {session_id}, skipping.")
-            return
-
-        # Create background task
-        task = asyncio.create_task(self._process_vas_lifecycle(vas_event))
-        self.active_tasks[session_id] = task
+        current_time = datetime.now().timestamp()
         
-        # Cleanup task when done
-        task.add_done_callback(lambda t: self.active_tasks.pop(session_id, None))
+        for vas in vas_events:
+            try:
+                # Check for POS match
+                match = await self._find_pos_match(vas)
+                
+                if match:
+                    print(f"[FraudEngine] Matched VAS {vas.SessionId} with POS {match.POSId}")
+                    await self._execute_judgment(vas, match)
+                else:
+                    # Check age (Assuming SessionEnd is the event timestamp)
+                    # We accept up to 2 minutes delay.
+                    event_age = current_time - vas.SessionEnd
+                    if event_age > 120: # 2 minutes
+                        print(f"[FraudEngine] VAS {vas.SessionId} unmatched older than 2 mins. Raising Missing Alert.")
+                        await self._raise_missing_alert(vas, missing_type="POS")
+                    else:
+                        # Too recent, leave it for now
+                        pass
+                        
+            except Exception as e:
+                print(f"[FraudEngine] Error processing VAS {vas.SessionId}: {e}")
 
-    async def _process_vas_lifecycle(self, vas_event: VASEvent):
+    async def run_pos_batch_process(self):
         """
-        Manages the lifecycle of a VAS event:
-        1. Check for match immediately.
-        2. If not found, wait 4 minutes.
-        3. Check again.
-        4. If found -> Validate & Move.
-        5. If not found -> Raise Alert.
+        Process all pending POS events:
+        1. Read POS data.
+        2. For each event, check for VAS match.
+        3. If match found -> Validate & Move.
+           (Note: Usually VAS process runs first, so matches should be handled there, but this handles race/order issues)
+        4. If not found:
+           - If older than 2 mins -> Raise Alert (Missing VAS) & Move.
+           - If recent -> Skip.
         """
+        print("[FraudEngine] Starting POS Batch Process...")
+        pos_events = await self._read_pos_file()
+        
+        current_time = datetime.now().timestamp()
+        
+        for pos in pos_events:
+            try:
+                # Check for VAS match
+                match = await self._find_vas_match(pos)
+                
+                if match:
+                    print(f"[FraudEngine] Matched POS {pos.POSId} with VAS {match.SessionId}")
+                    await self._execute_judgment(match, pos) # Note order: vas, pos
+                else:
+                    event_age = current_time - pos.SessionTime
+                    if event_age > 120:
+                         print(f"[FraudEngine] POS {pos.POSId} unmatched older than 2 mins. Raising Missing Alert.")
+                         await self._raise_missing_alert(pos, missing_type="VAS")
+                    else:
+                        pass
+            except Exception as e:
+                print(f"[FraudEngine] Error processing POS {pos.POSId}: {e}")
+
+    async def _read_vas_file(self) -> List[VASEvent]:
+        if not os.path.exists(VAS_DATA_FILE): return []
         try:
-            # 1. First Check
-            print(f"[FraudEngine] {vas_event.SessionId}: Initial check for POS match...")
-            match = await self._find_pos_match(vas_event)
-            
-            if match:
-                print(f"[FraudEngine] {vas_event.SessionId}: Match found immediately!")
-                await self._execute_judgment(vas_event, match)
-                return
-
-            # 2. Wait (4 minutes)
-            print(f"[FraudEngine] {vas_event.SessionId}: No match found. Waiting 4 minutes...")
-            await asyncio.sleep(240) 
-
-            # 3. Second Check
-            print(f"[FraudEngine] {vas_event.SessionId}: Retry check after wait...")
-            match = await self._find_pos_match(vas_event)
-
-            if match:
-                print(f"[FraudEngine] {vas_event.SessionId}: Match found after wait!")
-                await self._execute_judgment(vas_event, match)
-                return
-
-            # 4. Final: No match found
-            print(f"[FraudEngine] {vas_event.SessionId}: Still no match. Raising alert.")
-            await self._raise_missing_alert(vas_event)
-
+            with open(VAS_DATA_FILE, "r") as f:
+                content = f.read()
+                if not content: return []
+                data = json.loads(content)
+                return [VASEvent(**item) for item in data]
         except Exception as e:
-            print(f"[FraudEngine] Error in lifecycle for {vas_event.SessionId}: {e}")
+            print(f"[FraudEngine] Error reading VAS file: {e}")
+            return []
+
+    async def _read_pos_file(self) -> List[POSEvent]:
+        async with self.pos_lock:
+            if not os.path.exists(POS_DATA_FILE): return []
+            try:
+                with open(POS_DATA_FILE, "r") as f:
+                    content = f.read()
+                    if not content: return []
+                    data = json.loads(content)
+                    return [POSEvent(**item) for item in data]
+            except Exception as e:
+                print(f"[FraudEngine] Error reading POS file: {e}")
+                return []
 
     async def _find_pos_match(self, vas_event: VASEvent) -> Optional[POSEvent]:
         """
         Reads POS data and looks for a match based on SellerWindowId and Time.
         Condition: vas.SessionStart <= pos.SessionTime <= vas.SessionEnd
         """
-        pos_data_list = []
-        async with self.pos_lock:
-            if os.path.exists(POS_DATA_FILE):
-                try:
-                    with open(POS_DATA_FILE, "r") as f:
-                        content = f.read()
-                        if content:
-                            pos_data_list = json.loads(content)
-                except Exception as e:
-                    print(f"[FraudEngine] Error reading POS file: {e}")
-                    return None
-
-        # Filter for logic
-        candidates = []
-        for p in pos_data_list:
-            # Check SellerWindowId
-            p_window = p.get("SellerWindowId")
-            if p_window != vas_event.SellerWindowId:
-                continue
-
-            # Check Time
-            p_time = p.get("SessionTime", 0)
-            if vas_event.SessionStart <= p_time <= vas_event.SessionEnd:
-                candidates.append(p)
-
-        if not candidates:
-            return None
+        # We need to re-read or pass the list? 
+        # Ideally we read the file again to get latest state, 
+        # or we rely on the list we just read? 
+        # To be safe and simple, let's look at the file (masked by lock if needed).
+        # Actually, self.run_vas_batch_process iterates the file content.
+        # But for matching we need the OTHER file.
         
-        # If multiple matches, we might need logic? User said "if found more than one event, then compare the timeframes"
-        # We already compared timeframes. 
-        # For now, pick the first valid one.
-        if len(candidates) > 1:
-            print(f"[FraudEngine] Warning: Multiple POS matches for {vas_event.SessionId}. Picking first.")
+        pos_list = await self._read_pos_file()
+        
+        for p in pos_list:
+            if p.SellerWindowId == vas_event.SellerWindowId:
+                if vas_event.SessionStart <= p.SessionTime <= vas_event.SessionEnd:
+                    return p
+        return None
 
-        return POSEvent(**candidates[0])
+    async def _find_vas_match(self, pos_event: POSEvent) -> Optional[VASEvent]:
+        """
+        Reads VAS data and looks for a match.
+        Condition: vas.SessionStart <= pos.SessionTime <= vas.SessionEnd
+        """
+        vas_list = await self._read_vas_file()
+        
+        for v in vas_list:
+             if v.SellerWindowId == pos_event.SellerWindowId:
+                if v.SessionStart <= pos_event.SessionTime <= v.SessionEnd:
+                    return v
+        return None
 
     async def _execute_judgment(self, vas: VASEvent, pos: POSEvent):
         """
@@ -184,44 +211,89 @@ class FraudEngine:
         # Move Data
         await self._move_data_processed(vas, pos)
 
-    async def _raise_missing_alert(self, vas: VASEvent):
+    async def _raise_missing_alert(self, event_obj, missing_type: str):
         """
-        Raised when VAS exists but no POS found after timeout.
+        Raised when an event is missing its counterpart after timeout.
+        event_obj can be VASEvent or POSEvent.
+        missing_type is "POS" (if event_obj is VAS) or "VAS" (if event_obj is POS).
         """
-        triggered_rules = ["Corresponding object is not present in VAS for POS and vise versa"]
+        triggered_rules = [f"Corresponding {missing_type} data not found"]
         risk_level = "High"
         
-        # Create Phantom Transaction for display
-        transaction_id = f"TXN-{vas.SessionId}-MISSING"
+        # Construct Transaction Data based on what we have
+        if missing_type == "POS":
+            # We have VAS
+            vas = event_obj
+            pos = None
+            t_id = f"TXN-{vas.SessionId}-MISSING"
+            timestamp = datetime.fromtimestamp(vas.SessionEnd)
+            shop_id = vas.StoreId
+            cam_id = vas.CamId
+            pos_id = "Unknown"
+            cashier = "Unknown"
+            total = 0.0
+            
+        else:
+             # We have POS
+            pos = event_obj
+            vas = None # We don't have VAS object, but we need to pass something if we want to log it?
+                       # Or we create a dummy VAS? Or just handle None in alert creation?
+            
+            t_id = f"TXN-POS-{pos.POSId}-MISSING"
+            timestamp = datetime.fromtimestamp(pos.SessionTime)
+            shop_id = pos.StoreId
+            cam_id = "Unknown"
+            pos_id = pos.POSId
+            cashier = pos.CashierName
+            total = pos.TransactionTotal
+
         transaction = Transaction(
-            id=transaction_id,
-            shop_id=vas.StoreId,
-            cam_id=vas.CamId,
-            pos_id="Unknown", 
-            cashier_name="Unknown", 
-            timestamp=datetime.fromtimestamp(vas.SessionEnd),
-            transaction_total=0.0,
+            id=t_id,
+            shop_id=shop_id,
+            cam_id=cam_id,
+            pos_id=pos_id,
+            cashier_name=cashier,
+            timestamp=timestamp,
+            transaction_total=total,
             risk_level=risk_level,
             triggered_rules=triggered_rules,
             status=TransactionStatus.FRAUDULENT,
             fraud_category=triggered_rules[0],
-            notes="POS Data Missing"
+            notes=f"{missing_type} Data Missing"
         )
-        await self.update_callback("NEW_TRANSACTION", transaction)
-        await self._create_alert(vas, None, triggered_rules, risk_level, transaction_id)
         
-        # Remove from pending
-        await self._remove_vas_event(vas)
+        await self.update_callback("NEW_TRANSACTION", transaction)
+        
+        # Alert needs VAS object mostly for StoreId/CamId?
+        # If VAS missing, we pass None?
+        await self._create_alert(vas, pos, triggered_rules, risk_level, t_id)
+        
+        # Archive and Remove
+        if missing_type == "POS":
+            # Archive VAS event as it is processed (even if missing counterpart)
+            # We might want to enrich it or just dump it?
+            # Dumping raw VAS event to archive.
+            await self._append_to_file(VAS_EVENTS_FILE, vas.model_dump())
+            await self._remove_vas_event(vas)
+        else:
+            # Archive POS event
+            await self._append_to_file(SALES_DATA_FILE, pos.model_dump())
+            await self._remove_pos_event(pos)
 
-    async def _create_alert(self, vas: VASEvent, pos: Optional[POSEvent], rules: List[str], risk_level: str, transaction_id: str):
+    async def _create_alert(self, vas: Optional[VASEvent], pos: Optional[POSEvent], rules: List[str], risk_level: str, transaction_id: str):
+        
+        shop_id = vas.StoreId if vas else (pos.StoreId if pos else "Unknown")
+        cashier = pos.CashierName if pos else "Unknown"
+        ts = datetime.fromtimestamp(vas.SessionEnd) if vas else (datetime.fromtimestamp(pos.SessionTime) if pos else datetime.now())
+        
         alert = Alert(
             id=f"ALT-{uuid.uuid4().hex[:6].upper()}",
             transaction_id=transaction_id,
-            shop_id=vas.StoreId,
-            cashier_name=pos.CashierName if pos else "Unknown",
+            shop_id=shop_id,
+            cashier_name=cashier,
             risk_level=risk_level,
             triggered_rules=rules,
-            timestamp=datetime.fromtimestamp(vas.SessionEnd),
+            timestamp=ts,
             status=AlertStatus.NEW
         )
         await self.update_callback("NEW_ALERT", alert)
@@ -231,16 +303,15 @@ class FraudEngine:
         Moves matched events to processed files.
         """
         # 1. Append to Archive Files
-        await self._append_to_file(VAS_EVENTS_FILE, vas.model_dump())
-        await self._append_to_file(SALES_DATA_FILE, pos.model_dump())
+        if vas: await self._append_to_file(VAS_EVENTS_FILE, vas.model_dump())
+        if pos: await self._append_to_file(SALES_DATA_FILE, pos.model_dump())
 
         # 2. Remove from Source Files
-        await self._remove_vas_event(vas)
-        await self._remove_pos_event(pos)
+        if vas: await self._remove_vas_event(vas)
+        if pos: await self._remove_pos_event(pos)
 
     async def _append_to_file(self, filename: str, data: dict):
-        # Simple append, no lock? Ideally lock if multiple writers.
-        # Assuming we are single writer (FraudEngine) for archives.
+        # Scan file, append, write.
         try:
             items = []
             if os.path.exists(filename):
@@ -261,18 +332,11 @@ class FraudEngine:
         try:
             if not os.path.exists(VAS_DATA_FILE): return
             
-            print(f"[FraudEngine] Acquiring lock to remove VAS {vas.SessionId}")
-            with acquire_file_lock(VAS_DATA_FILE):
+            # Lock removed as per user request and ineffectiveness against external non-locking process.
+            if True: # Kept indentation block for minimal diff or could unindent
                 with open(VAS_DATA_FILE, "r") as f:
-                    items = json.loads(f.read())
-                
-                # Check if it even exists currently (handling user deletion)
-                exists = any(i.get("SessionId") == vas.SessionId for i in items)
-                if not exists:
-                    print(f"[FraudEngine] VAS {vas.SessionId} already removed (by User/Other).")
-                    return # Do nothing, to avoid overwriting user changes? 
-                           # Actually, if we just write back 'items' we do nothing.
-                           # But we want to remove it.
+                    content = f.read()
+                    items = json.loads(content) if content else []
                 
                 new_items = [i for i in items if i.get("SessionId") != vas.SessionId]
                 
@@ -289,7 +353,8 @@ class FraudEngine:
                 if not os.path.exists(POS_DATA_FILE): return
 
                 with open(POS_DATA_FILE, "r") as f:
-                    items = json.loads(f.read())
+                    content = f.read()
+                    items = json.loads(content) if content else []
                 
                 new_items = []
                 removed = False

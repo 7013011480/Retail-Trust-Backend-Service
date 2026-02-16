@@ -60,60 +60,24 @@ pos_file_path = "pos_data.json"
 # Initialize FraudEngine with lock
 fraud_engine = FraudEngine(update_callback=broadcast_update, pos_lock=pos_lock)
 
-async def file_orchestrator():
+async def scheduled_data_processor():
     """
-    Background task to monitor VAS events and dispatch them to the fraud engine.
+    Background task to process VAS and POS data every 2 minutes.
     """
-    print("Starting File Orchestrator...")
-    vas_file_path = "vas_data.json"
-    
-    # Track processed VAS events to avoid re-dispatching
-    # In a real app, this state should be persistent or inferred from the file.
-    # Since we are modifying the file (removing processed ones), 
-    # we just need to track what we've currently dispatched that hasn't been removed yet?
-    # Or simply: duplicate dispatch might be handled by FraudEngine.
-    # FraudEngine checks active_tasks. 
-    # But if FraudEngine finishes and removes it, it's gone.
-    # If file orchestrator sees it again?
-    # Wait, FraudEngine removes it from the file.
-    # So if it's in the file, it's either new or pending.
-    # If it is pending (previously dispatched), FraudEngine might still be working on it?
-    # Or if FraudEngine crashed/restarted?
-    
-    # We should dispatch anything we see in the file.
-    # FraudEngine `handle_vas_event` checks `active_tasks`. 
-    # If it is running, it skips.
-    # If it finished (and failed to remove?), it might start again.
-    # But logic says it removes it.
-    
+    print("Starting Scheduled Data Processor...")
     while True:
         try:
-            if os.path.exists(vas_file_path):
-                vas_data_list = []
-                try:
-                    with open(vas_file_path, "r") as f:
-                        content = f.read()
-                        if content:
-                            vas_data_list = json.loads(content)
-                except Exception as e:
-                    print(f"[Orchestrator] Error reading VAS file: {e}")
-                
-                for vas_item in vas_data_list:
-                    try:
-                        # Validate/Parse
-                        vas_event = VASEvent(**vas_item)
-                        
-                        # Dispatch to Engine
-                        # The engine will handle deduplication of active tasks
-                        await fraud_engine.handle_vas_event(vas_event)
-                        
-                    except Exception as e:
-                        print(f"[Orchestrator] Error processing VAS item: {e}")
+            # 1. Process VAS
+            await fraud_engine.run_vas_batch_process()
+            
+            # 2. Process POS
+            await fraud_engine.run_pos_batch_process()
             
         except Exception as e:
-            print(f"Error in file orchestrator: {e}")
+            print(f"Error in scheduled data processor: {e}")
         
-        await asyncio.sleep(2) # Interval
+        # Wait 2 minutes
+        await asyncio.sleep(120)
 
 @app.on_event("startup")
 async def startup_event():
@@ -121,8 +85,8 @@ async def startup_event():
     poller = SalesPoller(file_lock=pos_lock, storage_path=pos_file_path)
     asyncio.create_task(poller.start_polling())
     
-    # Start file orchestrator
-    asyncio.create_task(file_orchestrator())
+    # Start scheduled processor
+    asyncio.create_task(scheduled_data_processor())
 
 @app.on_event("shutdown")
 def shutdown_event():
