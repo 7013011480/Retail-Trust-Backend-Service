@@ -4,7 +4,6 @@ from fastapi.middleware.cors import CORSMiddleware
 from typing import List, Set
 import uvicorn
 import json
-import redis
 import os
 import time
 from concurrent.futures import ThreadPoolExecutor
