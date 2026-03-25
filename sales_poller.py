@@ -5,7 +5,6 @@ import time
 import logging
 from datetime import datetime, timedelta
 import os
-import redis
 import truststore
 
 class SalesPoller:
