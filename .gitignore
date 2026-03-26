@@ -29,7 +29,7 @@ pos_event.json
 vas_event.json
 vas_metadata.json
 pos_processed_metadata.json
-
+mapping.json
 
 # Lock files
 *.lock
