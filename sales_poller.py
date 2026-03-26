@@ -51,8 +51,8 @@ class SalesPoller:
         print(f"[{datetime.now()}] Polling sales data from {from_time} to {to_time}...")
         
         try:
-            ctx = truststore.SSLContext(verify=ctx)
-            async with httpx.AsyncClient() as client:
+            ctx = truststore.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
+            async with httpx.AsyncClient(verify=ctx) as client: 
                 response = await client.post(self.api_url, headers=self.headers, json=payload)
                 
             if response.status_code == 200:
