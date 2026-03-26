@@ -9,7 +9,7 @@ venv/
 env/
 
 # Environment Variables
-
+.env
 
 # Ide
 .vscode/
@@ -22,8 +22,14 @@ env/
 dump.rdb
 
 # Application Data (JSON files acting as DB)
+pos_data.json
+vas_data.json
+sales_data.json
+pos_event.json
+vas_event.json
+vas_metadata.json
 pos_processed_metadata.json
-mapping.json
+
 
 # Lock files
 *.lock
