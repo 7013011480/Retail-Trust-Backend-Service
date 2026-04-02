@@ -169,25 +169,19 @@ async def idle_pos_monitor():
                 gap_minutes = (now - last_ts).total_seconds() / 60
                 if gap_minutes >= idle_minutes and pos_key not in alerted_idle:
                     store_id, pos_id = pos_key.split("_", 1) if "_" in pos_key else (pos_key, "Unknown")
-                    alert_data = {
-                        "type": "NEW_TRANSACTION",
-                        "data": {
-                            "id": f"TXN-IDLE-{pos_key}-{int(now.timestamp())}",
-                            "shop_id": store_id,
-                            "shop_name": store_name_map.get(store_id, store_id),
-                            "cam_id": "N/A",
-                            "pos_id": pos_id,
-                            "cashier_name": "N/A",
-                            "timestamp": now.isoformat(),
-                            "transaction_total": 0,
-                            "risk_level": "Medium",
-                            "triggered_rules": [f"POS Idle for {int(gap_minutes)} minutes"],
-                            "status": "suspicious",
-                            "fraud_category": "POS Idle",
-                        }
+                    alert_record = {
+                        "id": f"ALT-IDLE-{pos_key}-{int(now.timestamp())}",
+                        "transaction_id": "N/A",
+                        "shop_id": store_id,
+                        "shop_name": store_name_map.get(store_id, store_id),
+                        "cashier_name": "N/A",
+                        "risk_level": "Medium",
+                        "triggered_rules": [f"POS Idle for {int(gap_minutes)} minutes"],
+                        "timestamp": now.isoformat(),
+                        "status": "new",
                     }
-                    await manager.broadcast(json.dumps(alert_data))
-                    append_jsonl(TRANSACTIONS_FILE, alert_data["data"])
+                    await manager.broadcast(json.dumps({"type": "NEW_ALERT", "data": alert_record}))
+                    append_jsonl(ALERTS_FILE, alert_record)
                     alerted_idle.add(pos_key)
                     print(f"[Idle Monitor] Alert: {pos_key} idle for {int(gap_minutes)} minutes")
                 elif gap_minutes < idle_minutes and pos_key in alerted_idle:
@@ -321,7 +315,7 @@ async def update_config(config: dict):
 
 
 @app.get("/api/history")
-async def get_historical_data(days: int = 10):
+async def get_historical_data(days: int = 5):
     """Fetch new POS data from the API since last saved transaction and classify."""
     # Find the latest timestamp in our persisted data
     existing = read_jsonl(TRANSACTIONS_FILE)
@@ -453,7 +447,28 @@ async def get_historical_data(days: int = 10):
                 append_jsonl("bills_raw.jsonl", {"txn_id": txn["id"], "bill": bills_map[txn["id"]]})
             new_count += 1
 
-    print(f"[History] Persisted {new_count} new transactions to {TRANSACTIONS_FILE}")
+    # Also generate alerts for flagged transactions
+    existing_alert_ids = {r.get("id") for r in read_jsonl(ALERTS_FILE)}
+    alert_count = 0
+    for txn in transactions:
+        if txn["risk_level"] != "Low" and txn.get("triggered_rules"):
+            alert_id = f"ALT-{txn['id']}"
+            if alert_id not in existing_alert_ids:
+                alert_record = {
+                    "id": alert_id,
+                    "transaction_id": txn["id"],
+                    "shop_id": txn["shop_id"],
+                    "shop_name": txn.get("shop_name", txn["shop_id"]),
+                    "cashier_name": txn.get("cashier_name", "Unknown"),
+                    "risk_level": txn["risk_level"],
+                    "triggered_rules": txn["triggered_rules"],
+                    "timestamp": txn["timestamp"],
+                    "status": "new",
+                }
+                append_jsonl(ALERTS_FILE, alert_record)
+                alert_count += 1
+
+    print(f"[History] Persisted {new_count} transactions, {alert_count} alerts")
 
     return {
         "transactions": transactions,
@@ -465,10 +480,8 @@ async def get_historical_data(days: int = 10):
 async def get_transactions():
     """Get all persisted transactions from local JSONL (no external API call)."""
     transactions = read_jsonl(TRANSACTIONS_FILE)
-    # Sort latest first
     transactions.sort(key=lambda t: t.get("timestamp", ""), reverse=True)
 
-    # Load raw bills map
     bills_map = {}
     for record in read_jsonl("bills_raw.jsonl"):
         bills_map[record.get("txn_id", "")] = record.get("bill", {})
@@ -477,6 +490,14 @@ async def get_transactions():
         "transactions": transactions,
         "bills_map": bills_map
     }
+
+
+@app.get("/api/alerts")
+async def get_alerts():
+    """Get all persisted alerts from local JSONL."""
+    alerts = read_jsonl(ALERTS_FILE)
+    alerts.sort(key=lambda a: a.get("timestamp", ""), reverse=True)
+    return alerts
 
 
 if __name__ == "__main__":

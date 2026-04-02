@@ -301,59 +301,39 @@ class FraudEngine:
     async def _raise_missing_alert(self, event_obj, missing_type: str):
         """
         Raised when an event is missing its counterpart after timeout.
-        event_obj can be VASEvent or POSEvent.
-        missing_type is "POS" (if event_obj is VAS) or "VAS" (if event_obj is POS).
+        Only creates an alert — not a fake transaction.
         """
         triggered_rules = [f"Corresponding {missing_type} data not found"]
         risk_level = "High"
-        
-        # Construct Transaction Data based on what we have
+
         if missing_type == "POS":
-            # We have VAS
             vas = event_obj
             pos = None
-            t_id = f"TXN-{vas.SessionId}-MISSING"
-            timestamp = datetime.strptime(vas.SessionEnd, "%Y-%m-%d %H:%M:%S").replace(tzinfo=IST)
+            alert_id = f"ALT-MISSING-{vas.SessionId}"
             shop_id = vas.StoreId
-            cam_id = vas.SellerWindowId
             pos_id = "Unknown"
             cashier = "Unknown"
-            total = 0.0
-            
+            timestamp = datetime.strptime(vas.SessionEnd, "%Y-%m-%d %H:%M:%S").replace(tzinfo=IST)
         else:
-             # We have POS
             pos = event_obj
-            vas = None # We don't have VAS object, but we need to pass something if we want to log it?
-                       # Or we create a dummy VAS? Or just handle None in alert creation?
-            
-            t_id = f"TXN-POS-{pos.POSId}-MISSING"
-            timestamp = datetime.strptime(pos.SessionTime, "%Y-%m-%d %H:%M:%S").replace(tzinfo=IST)
+            vas = None
+            alert_id = f"ALT-MISSING-{pos.POSId}-{int(datetime.now(IST).timestamp())}"
             shop_id = pos.StoreId
-            cam_id = "Unknown"
             pos_id = pos.POSId
             cashier = pos.CashierName
-            total = pos.TransactionTotal
+            timestamp = datetime.strptime(pos.SessionTime, "%Y-%m-%d %H:%M:%S").replace(tzinfo=IST)
 
-        transaction = Transaction(
-            id=t_id,
+        alert = Alert(
+            id=alert_id,
+            transaction_id="N/A",
             shop_id=shop_id,
-            cam_id=cam_id,
-            pos_id=pos_id,
             cashier_name=cashier,
-            timestamp=timestamp,
-            transaction_total=total,
             risk_level=risk_level,
             triggered_rules=triggered_rules,
-            status=TransactionStatus.FRAUDULENT,
-            fraud_category=triggered_rules[0],
-            notes=f"{missing_type} Data Missing"
+            timestamp=timestamp,
+            status=AlertStatus.NEW
         )
-        
-        await self.update_callback("NEW_TRANSACTION", transaction)
-        
-        # Alert needs VAS object mostly for StoreId/CamId?
-        # If VAS missing, we pass None?
-        await self._create_alert(vas, pos, triggered_rules, risk_level, t_id)
+        await self.update_callback("NEW_ALERT", alert)
         
         # Archive and Remove
         if missing_type == "POS":
