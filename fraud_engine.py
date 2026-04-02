@@ -68,11 +68,11 @@ class FraudEngine:
     def _ist_to_unix(self, ist_str: str) -> float:
         """Helper to convert IST timestamp string to Unix timestamp."""
         try:
-            dt = datetime.strptime(ist_str, "%Y-%m-%d %H:%M:%S")
+            dt = datetime.strptime(ist_str, "%Y-%m-%d %H:%M:%S").replace(tzinfo=IST)
             return dt.timestamp()
         except Exception as e:
             print(f"[FraudEngine] Error parsing IST timestamp {ist_str}: {e}")
-            return datetime.now().timestamp()
+            return datetime.now(IST).timestamp()
 
     async def run_vas_batch_process(self):
         """
@@ -87,7 +87,7 @@ class FraudEngine:
         print("[FraudEngine] Starting VAS Batch Process...")
         vas_events = await self._read_vas_file()
         
-        current_time = datetime.now().timestamp()
+        current_time = datetime.now(IST).timestamp()
         
         for vas in vas_events:
             try:
@@ -125,7 +125,7 @@ class FraudEngine:
         print("[FraudEngine] Starting POS Batch Process...")
         pos_events = await self._read_pos_file()
         
-        current_time = datetime.now().timestamp()
+        current_time = datetime.now(IST).timestamp()
         
         for pos in pos_events:
             try:
