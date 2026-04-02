@@ -20,7 +20,7 @@ class SalesPoller:
         self.api_url = os.getenv("EXTERNAL_SALES_URL")
         token = os.getenv("EXTERNAL_SALES_HEADER_TOKEN")
         self.headers = {"X-Nukkad-API-Token": token}
-        self.cin = "NSCIN1223" # User should replace this
+        self.cin = "NDCIN1223"
         self.mapping = {}
         self._load_mapping()
         # Redis removed
