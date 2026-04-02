@@ -226,7 +226,9 @@ class FraudEngine:
             triggered_rules.append(f"High Discount ({pos.DiscountPercent}%)")
 
         # Rule 4: Refund (configurable threshold)
-        if pos.RefundAmount > config["refund_amount_threshold"]:
+        # Only flag refunds for non-cash payments (cash returnAmt is just change given back)
+        pos_mode = str(pos.ModeOfTransaction).lower() if hasattr(pos, 'ModeOfTransaction') else "unknown"
+        if pos.RefundAmount > config["refund_amount_threshold"] and pos_mode != "cash":
             triggered_rules.append(f"Refund Processed (Rs.{pos.RefundAmount})")
 
         # Rule 5: Complementary order
