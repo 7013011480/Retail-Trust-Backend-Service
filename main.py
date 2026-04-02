@@ -116,9 +116,18 @@ async def idle_pos_monitor():
     Fires an alert if no transaction has been processed for longer than the configured threshold.
     """
     print("Starting Idle POS Monitor...")
-    # Track last known transaction time per POS
     last_txn_time: dict[str, datetime] = {}
-    alerted_idle: set[str] = set()  # Don't re-alert for the same idle period
+    alerted_idle: set[str] = set()
+
+    # Load store names
+    store_name_map = {}
+    try:
+        if os.path.exists("stores.json"):
+            with open("stores.json", "r") as f:
+                for s in json.load(f):
+                    store_name_map[s["cin"]] = s.get("name", s["cin"])
+    except:
+        pass
 
     while True:
         try:
@@ -165,6 +174,7 @@ async def idle_pos_monitor():
                         "data": {
                             "id": f"TXN-IDLE-{pos_key}-{int(now.timestamp())}",
                             "shop_id": store_id,
+                            "shop_name": store_name_map.get(store_id, store_id),
                             "cam_id": "N/A",
                             "pos_id": pos_id,
                             "cashier_name": "N/A",
