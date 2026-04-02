@@ -22,10 +22,20 @@ class SalesPoller:
         self.api_url = os.getenv("EXTERNAL_SALES_URL")
         token = os.getenv("EXTERNAL_SALES_HEADER_TOKEN")
         self.headers = {"X-Nukkad-API-Token": token}
-        self.cin = "NDCIN1223"
+        self.stores = self._load_stores()
         self.mapping = {}
         self._load_mapping()
-        # Redis removed
+
+    def _load_stores(self) -> list:
+        try:
+            if os.path.exists("stores.json"):
+                with open("stores.json", "r") as f:
+                    stores = json.load(f)
+                    print(f"Loaded {len(stores)} stores.")
+                    return stores
+        except Exception as e:
+            print(f"Error loading stores.json: {e}")
+        return [{"cin": "NDCIN1223", "name": "Ram Ki Bandi"}]
 
     def _load_mapping(self):
         try:
@@ -39,36 +49,39 @@ class SalesPoller:
             print(f"Error loading mapping.json: {e}")
 
     async def fetch_sales(self):
-        """Fetches sales data from the API."""
+        """Fetches sales data from the API for all stores."""
         now = datetime.now(_IST)
         to_time = int(now.timestamp())
         from_time = int((now - timedelta(minutes=2)).timestamp())
 
-        payload = {
-            "cin": self.cin,
-            "from": str(from_time),
-            "to": str(to_time),
-            "pageNo": "1"
-        }
+        print(f"[{datetime.now(_IST).strftime('%H:%M:%S')}] Polling {len(self.stores)} stores...")
 
-        print(f"[{datetime.now()}] Polling sales data from {from_time} to {to_time}...")
-        
-        try:
-            ctx = truststore.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
-            async with httpx.AsyncClient(verify=ctx) as client: 
-                response = await client.post(self.api_url, headers=self.headers, json=payload)
-                
-            if response.status_code == 200:
-                data = response.json()
-                if data.get("response") and "data" in data and "bills" in data["data"]:
-                    await self.process_bills(data["data"]["bills"])
+        ctx = truststore.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
+
+        for store in self.stores:
+            cin = store["cin"]
+            payload = {
+                "cin": cin,
+                "from": str(from_time),
+                "to": str(to_time),
+                "pageNo": "1"
+            }
+
+            try:
+                async with httpx.AsyncClient(verify=ctx, timeout=15.0) as client:
+                    response = await client.post(self.api_url, headers=self.headers, json=payload)
+
+                if response.status_code == 200:
+                    data = response.json()
+                    if data.get("response") and "data" in data and "bills" in data["data"]:
+                        bills = data["data"]["bills"]
+                        if bills:
+                            await self.process_bills(bills)
                 else:
-                    print(f"API returned success but no bills found or invalid format.")
-            else:
-                print(f"API request failed: {response.status_code} - {response.text}")
-                
-        except Exception as e:
-            print(f"Error fetching sales data: {e}")
+                    print(f"  [{cin}] API failed: {response.status_code}")
+
+            except Exception as e:
+                print(f"  [{cin}] Error: {e}")
 
     async def process_bills(self, bills: list):
         """Processes the list of bills and writes to shared file."""
@@ -166,56 +179,63 @@ class SalesPoller:
             print(f"Added {added_count} new bills to {self.output_file}")
 
     async def fetch_historical(self, days: int = 10) -> dict:
-        """Fetches historical sales data for the last N days. Returns processed events and raw bills."""
+        """Fetches historical sales data for the last N days across all stores."""
         all_events = []
         raw_bills = []
         now = datetime.now(_IST)
         ctx = truststore.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
 
-        for day_offset in range(days, 0, -1):
-            day_start = now - timedelta(days=day_offset)
-            day_end = now - timedelta(days=day_offset - 1)
-            from_ts = str(int(day_start.timestamp()))
-            to_ts = str(int(day_end.timestamp()))
+        for store in self.stores:
+            cin = store["cin"]
+            store_count = 0
 
-            page = 1
-            while True:
-                payload = {
-                    "cin": self.cin,
-                    "from": from_ts,
-                    "to": to_ts,
-                    "pageNo": str(page)
-                }
-                try:
-                    async with httpx.AsyncClient(verify=ctx, timeout=30.0) as client:
-                        response = await client.post(self.api_url, headers=self.headers, json=payload)
+            for day_offset in range(days, 0, -1):
+                day_start = now - timedelta(days=day_offset)
+                day_end = now - timedelta(days=day_offset - 1)
+                from_ts = str(int(day_start.timestamp()))
+                to_ts = str(int(day_end.timestamp()))
 
-                    if response.status_code == 200:
-                        data = response.json()
-                        if data.get("response") and "data" in data and "bills" in data["data"]:
-                            bills = data["data"]["bills"]
-                            if not bills:
+                page = 1
+                while True:
+                    payload = {
+                        "cin": cin,
+                        "from": from_ts,
+                        "to": to_ts,
+                        "pageNo": str(page)
+                    }
+                    try:
+                        async with httpx.AsyncClient(verify=ctx, timeout=30.0) as client:
+                            response = await client.post(self.api_url, headers=self.headers, json=payload)
+
+                        if response.status_code == 200:
+                            data = response.json()
+                            if data.get("response") and "data" in data and "bills" in data["data"]:
+                                bills = data["data"]["bills"]
+                                if not bills:
+                                    break
+                                for bill in bills:
+                                    event = self._bill_to_event(bill)
+                                    if event:
+                                        all_events.append(event)
+                                        raw_bills.append(bill)
+                                        store_count += 1
+
+                                page_count = data["data"].get("pageCount", 1)
+                                if page >= page_count:
+                                    break
+                                page += 1
+                            else:
                                 break
-                            for bill in bills:
-                                event = self._bill_to_event(bill)
-                                if event:
-                                    all_events.append(event)
-                                    raw_bills.append(bill)
-
-                            page_count = data["data"].get("pageCount", 1)
-                            if page >= page_count:
-                                break
-                            page += 1
                         else:
                             break
-                    else:
-                        print(f"Historical fetch failed for day -{day_offset}: {response.status_code}")
+                    except Exception as e:
+                        print(f"  [{cin}] Historical fetch error day -{day_offset}: {e}")
                         break
-                except Exception as e:
-                    print(f"Error fetching historical data for day -{day_offset}: {e}")
-                    break
 
-        print(f"Fetched {len(all_events)} historical bills over {days} days")
+            if store_count > 0:
+                print(f"  [{cin}] {store.get('name', '')} - {store_count} bills")
+
+        print(f"Fetched {len(all_events)} total historical bills across {len(self.stores)} stores over {days} days")
         return {"events": all_events, "raw_bills": raw_bills}
 
     def _bill_to_event(self, bill: dict) -> dict | None:

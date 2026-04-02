@@ -277,6 +277,18 @@ async def validate_transaction(transaction_id: str, decision: str, notes: str = 
     return {"status": "success"}
 
 
+@app.get("/api/stores")
+async def get_stores():
+    """Get list of configured stores."""
+    try:
+        if os.path.exists("stores.json"):
+            with open("stores.json", "r") as f:
+                return json.load(f)
+    except:
+        pass
+    return []
+
+
 @app.get("/api/config")
 async def get_config():
     """Get current rule configuration thresholds."""
@@ -328,6 +340,16 @@ async def get_historical_data(days: int = 10):
 
     transactions = []
     bills_map = {}
+
+    # Build store name lookup
+    store_names = {}
+    try:
+        if os.path.exists("stores.json"):
+            with open("stores.json", "r") as f:
+                for s in json.load(f):
+                    store_names[s["cin"]] = s.get("name", s["cin"])
+    except:
+        pass
 
     config = load_rule_config()
 
@@ -381,10 +403,12 @@ async def get_historical_data(days: int = 10):
             ts = datetime.now(IST).isoformat()
 
         cam_id = event.get("SellerWindowId", "Unknown")
+        shop_id = event.get("StoreId", "Unknown")
 
         transactions.append({
             "id": txn_id,
-            "shop_id": event.get("StoreId", "Unknown"),
+            "shop_id": shop_id,
+            "shop_name": store_names.get(shop_id, shop_id),
             "cam_id": cam_id,
             "pos_id": event.get("POSId", "Unknown"),
             "cashier_name": event.get("CashierName", "Unknown"),

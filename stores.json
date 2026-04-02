@@ -1,0 +1,18 @@
+[
+    {"cin": "NDCIN916", "name": "Wrapafella", "operator": "Devyani International Limited", "pos_system": "Posifly-Dino"},
+    {"cin": "NDCIN1223", "name": "Ram Ki Bandi", "operator": "Devyani International Limited", "pos_system": "Posifly-Dino"},
+    {"cin": "NDCIN1224", "name": "Pind Balluchi", "operator": "Devyani International Limited", "pos_system": "Posifly-Dino"},
+    {"cin": "NDCIN1226", "name": "Pizza Hut", "operator": "Devyani International Limited", "pos_system": "Posifly-Dino"},
+    {"cin": "NDCIN1227", "name": "KFC", "operator": "Devyani International Limited", "pos_system": "Posifly-Dino"},
+    {"cin": "NDCIN1228", "name": "Haldiram's-AeroPlaza", "operator": "Oam Industries (India) Private Limited", "pos_system": "Posifly-Dino"},
+    {"cin": "NDCIN1230", "name": "Seasons Xprs & Gourmet Kunafa", "operator": "Indo Middle Eastern Enterprises", "pos_system": "Posifly-Dino"},
+    {"cin": "NDCIN1231", "name": "Nizami Daawat", "operator": "Zoha Foods Private Limited", "pos_system": "Posifly-Dino"},
+    {"cin": "NDCIN1235", "name": "Costa Coffee", "operator": "Devyani International Limited", "pos_system": "Posifly-Dino"},
+    {"cin": "NDCIN1447", "name": "Cream Stone", "operator": "Sri Srinivasa Dairy Products Pvt Limited", "pos_system": "Posifly-Dino"},
+    {"cin": "NDCIN1539", "name": "Buffalo Wild Wings", "operator": "Chicken Wild Wings Pvt Ltd", "pos_system": "ARMS-Dino"},
+    {"cin": "NDCIN1604", "name": "McDonald's-1", "operator": "Radiance Aero Hospitality Services Private Limited", "pos_system": "ARMS-Dino"},
+    {"cin": "NDCIN1606", "name": "Barley & Grapes", "operator": "Radiance Aero Hospitality", "pos_system": "ARMS-Dino"},
+    {"cin": "NDCIN1608", "name": "Irani Cafe", "operator": "Devyani International Limited", "pos_system": "Posifly-Dino"},
+    {"cin": "NDCIN1611", "name": "Wow Momos", "operator": "Wow Momo Foods Pvt Ltd", "pos_system": "Posifly-Dino"},
+    {"cin": "NDCIN2082", "name": "Krispy Kreme-AeroPlaza", "operator": "CureFoods Pvt Ltd", "pos_system": "Posifly-Dino"}
+]
