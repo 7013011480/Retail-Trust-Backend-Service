@@ -300,7 +300,7 @@ class FraudEngine:
         
         shop_id = vas.StoreId if vas else (pos.StoreId if pos else "Unknown")
         cashier = pos.CashierName if pos else "Unknown"
-        ts = datetime.fromtimestamp(vas.SessionEnd) if vas else (datetime.fromtimestamp(pos.SessionTime) if pos else datetime.now())
+        ts = datetime.strptime(vas.SessionEnd, "%Y-%m-%d %H:%M:%S") if vas else (datetime.strptime(pos.SessionTime, "%Y-%m-%d %H:%M:%S") if pos else datetime.now())
         
         alert = Alert(
             id=f"ALT-{uuid.uuid4().hex[:6].upper()}",
