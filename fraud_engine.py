@@ -33,10 +33,24 @@ def load_rule_config() -> dict:
         pass
     return defaults
 
+def _load_camera_stores() -> set:
+    """Load set of store IDs that have camera mappings."""
+    stores = set()
+    try:
+        if os.path.exists("mapping.json"):
+            with open("mapping.json", "r") as f:
+                for key in json.load(f).keys():
+                    store_id = key.split("_")[0]
+                    stores.add(store_id)
+    except:
+        pass
+    return stores
+
 class FraudEngine:
     def __init__(self, update_callback: Callable, pos_lock: asyncio.Lock):
         self.update_callback = update_callback
         self.pos_lock = pos_lock
+        self.camera_stores = _load_camera_stores()
 
     def _ist_to_unix(self, ist_str: str) -> float:
         """Helper to convert IST timestamp string to Unix timestamp."""
@@ -111,8 +125,13 @@ class FraudEngine:
                 else:
                     event_age = current_time - self._ist_to_unix(pos.SessionTime)
                     if event_age > 120:
-                         print(f"[FraudEngine] POS {pos.POSId} unmatched older than 2 mins. Raising Missing Alert.")
-                         await self._raise_missing_alert(pos, missing_type="VAS")
+                        if pos.StoreId in self.camera_stores:
+                            print(f"[FraudEngine] POS {pos.POSId} unmatched older than 2 mins. Raising Missing Alert.")
+                            await self._raise_missing_alert(pos, missing_type="VAS")
+                        else:
+                            # Store has no camera — just archive without alert
+                            await self._append_to_file(SALES_DATA_FILE, pos.model_dump())
+                            await self._remove_pos_event(pos)
                     else:
                         pass
             except Exception as e:
