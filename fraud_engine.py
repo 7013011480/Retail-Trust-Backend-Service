@@ -4,7 +4,7 @@ import os
 import uuid
 from datetime import datetime, timedelta
 from typing import Dict, Optional, List, Callable
-from models import VASEvent, POSEvent, Transaction, Alert, TransactionStatus, AlertStatus, TransactionMode
+from models import VASEvent, POSEvent, Transaction, Alert, TransactionStatus, AlertStatus #, TransactionMode
 # from utils import acquire_file_lock
 
 # File Constants
@@ -17,6 +17,15 @@ class FraudEngine:
     def __init__(self, update_callback: Callable, pos_lock: asyncio.Lock):
         self.update_callback = update_callback
         self.pos_lock = pos_lock
+
+    def _ist_to_unix(self, ist_str: str) -> float:
+        """Helper to convert IST timestamp string to Unix timestamp."""
+        try:
+            dt = datetime.strptime(ist_str, "%Y-%m-%d %H:%M:%S")
+            return dt.timestamp()
+        except Exception as e:
+            print(f"[FraudEngine] Error parsing IST timestamp {ist_str}: {e}")
+            return datetime.now().timestamp()
 
     async def run_vas_batch_process(self):
         """
@@ -44,7 +53,7 @@ class FraudEngine:
                 else:
                     # Check age (Assuming SessionEnd is the event timestamp)
                     # We accept up to 2 minutes delay.
-                    event_age = current_time - vas.SessionEnd
+                    event_age = current_time - self._ist_to_unix(vas.SessionEnd)
                     if event_age > 120: # 2 minutes
                         print(f"[FraudEngine] VAS {vas.SessionId} unmatched older than 2 mins. Raising Missing Alert.")
                         await self._raise_missing_alert(vas, missing_type="POS")
@@ -80,7 +89,7 @@ class FraudEngine:
                     print(f"[FraudEngine] Matched POS {pos.POSId} with VAS {match.SessionId}")
                     await self._execute_judgment(match, pos) # Note order: vas, pos
                 else:
-                    event_age = current_time - pos.SessionTime
+                    event_age = current_time - self._ist_to_unix(pos.SessionTime)
                     if event_age > 120:
                          print(f"[FraudEngine] POS {pos.POSId} unmatched older than 2 mins. Raising Missing Alert.")
                          await self._raise_missing_alert(pos, missing_type="VAS")
@@ -130,7 +139,11 @@ class FraudEngine:
         
         for p in pos_list:
             if p.SellerWindowId == vas_event.SellerWindowId:
-                if vas_event.SessionStart <= p.SessionTime <= vas_event.SessionEnd:
+                # Comparison logic: vas.SessionStart <= pos.SessionTime <= vas.SessionEnd
+                vas_start = self._ist_to_unix(vas_event.SessionStart)
+                vas_end = self._ist_to_unix(vas_event.SessionEnd)
+                pos_time = self._ist_to_unix(p.SessionTime)
+                if vas_start <= pos_time <= vas_end:
                     return p
         return None
 
@@ -143,7 +156,10 @@ class FraudEngine:
         
         for v in vas_list:
              if v.SellerWindowId == pos_event.SellerWindowId:
-                if v.SessionStart <= pos_event.SessionTime <= v.SessionEnd:
+                vas_start = self._ist_to_unix(v.SessionStart)
+                vas_end = self._ist_to_unix(v.SessionEnd)
+                pos_time = self._ist_to_unix(pos_event.SessionTime)
+                if vas_start <= pos_time <= vas_end:
                     return v
         return None
 
@@ -155,11 +171,11 @@ class FraudEngine:
         risk_level = "Low"
 
         # Rule 1: Payment Mode Mismatch
-        vas_mode = str(vas.ModeOfTransaction.value).lower()
-        pos_mode = str(pos.ModeOfTransaction).lower()
+        # vas_mode = str(vas.ModeOfTransaction.value).lower()
+        # pos_mode = str(pos.ModeOfTransaction).lower()
         
-        if vas_mode != pos_mode:
-            triggered_rules.append(f"Payment Mode Mismatch (VAS: {vas.ModeOfTransaction.value}, POS: {pos.ModeOfTransaction})")
+        # if vas_mode != pos_mode:
+        #     triggered_rules.append(f"Payment Mode Mismatch (VAS: {vas.ModeOfTransaction.value}, POS: {pos.ModeOfTransaction})")
 
         # Rule 2: Bill not generated
         if not vas.ReceiptGenerationStatus:
@@ -193,7 +209,7 @@ class FraudEngine:
             cam_id=vas.CamId,
             pos_id=pos.POSId,
             cashier_name=pos.CashierName,
-            timestamp=datetime.fromtimestamp(pos.SessionTime),
+            timestamp=datetime.strptime(pos.SessionTime, "%Y-%m-%d %H:%M:%S"),
             transaction_total=pos.TransactionTotal,
             risk_level=risk_level,
             triggered_rules=triggered_rules,
@@ -226,7 +242,7 @@ class FraudEngine:
             vas = event_obj
             pos = None
             t_id = f"TXN-{vas.SessionId}-MISSING"
-            timestamp = datetime.fromtimestamp(vas.SessionEnd)
+            timestamp = datetime.strptime(vas.SessionEnd, "%Y-%m-%d %H:%M:%S")
             shop_id = vas.StoreId
             cam_id = vas.CamId
             pos_id = "Unknown"
@@ -240,7 +256,7 @@ class FraudEngine:
                        # Or we create a dummy VAS? Or just handle None in alert creation?
             
             t_id = f"TXN-POS-{pos.POSId}-MISSING"
-            timestamp = datetime.fromtimestamp(pos.SessionTime)
+            timestamp = datetime.strptime(pos.SessionTime, "%Y-%m-%d %H:%M:%S")
             shop_id = pos.StoreId
             cam_id = "Unknown"
             pos_id = pos.POSId

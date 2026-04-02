@@ -12,6 +12,7 @@ from fraud_engine import FraudEngine
 from models import Transaction, VASEvent, POSEvent
 from sales_poller import SalesPoller
 
+
 app = FastAPI(title="Retail Trust & Security Backend")
 
 # CORS
@@ -55,6 +56,7 @@ async def broadcast_update(type: str, data: any):
 # Synchronization for POS file access
 pos_lock = asyncio.Lock()
 pos_file_path = "pos_data.json"
+vas_file_path = "vas_data.json"
 
 # Initialize FraudEngine with lock
 fraud_engine = FraudEngine(update_callback=broadcast_update, pos_lock=pos_lock)
@@ -78,6 +80,45 @@ async def scheduled_data_processor():
         # Wait 2 minutes
         await asyncio.sleep(120)
 
+async def scheduled_stream_broadcaster():
+    """
+    Background task to broadcast the full content of VAS and POS data files every 30 seconds.
+    """
+    print("Starting Scheduled Stream Broadcaster...")
+    while True:
+        try:
+            # Broadcast VAS Data
+            vas_data = []
+            if os.path.exists(vas_file_path):
+                with open(vas_file_path, "r") as f:
+                    content = f.read()
+                    if content:
+                        vas_data = json.loads(content)
+            
+            await manager.broadcast(json.dumps({
+                "type": "RAW_VAS_DATA",
+                "data": vas_data
+            }))
+
+            # Broadcast POS Data
+            pos_data = []
+            if os.path.exists(pos_file_path):
+                with open(pos_file_path, "r") as f:
+                    content = f.read()
+                    if content:
+                        pos_data = json.loads(content)
+            
+            await manager.broadcast(json.dumps({
+                "type": "RAW_POS_DATA",
+                "data": pos_data
+            }))
+            
+        except Exception as e:
+            print(f"Error in stream broadcaster: {e}")
+        
+        # Wait 30 seconds
+        await asyncio.sleep(30)
+
 @app.on_event("startup")
 async def startup_event():
     # Start the sales polling loop in background
@@ -86,6 +127,9 @@ async def startup_event():
     
     # Start scheduled processor
     asyncio.create_task(scheduled_data_processor())
+
+    # Start stream broadcaster
+    asyncio.create_task(scheduled_stream_broadcaster())
 
 @app.on_event("shutdown")
 def shutdown_event():
@@ -119,26 +163,7 @@ async def validate_transaction(transaction_id: str, decision: str, notes: str = 
     
     return {"status": "success"}
     
-@app.get("/api/sales-stream")
-async def get_sales_stream(count: int = 10):
-    """
-    Fetch the latest sales data published to Redis Stream.
-    """
-    try:
-        r = redis.Redis(host='localhost', port=6379, db=0, decode_responses=True)
-        # Read last 'count' entries from the stream "sales_stream"
-        stream_data = r.xrevrange("sales_stream", count=count)
-        
-        results = []
-        for message_id, data in stream_data:
-            results.append({
-                "stream_id": message_id,
-                "data": data
-            })
-            
-        return {"status": "success", "count": len(results), "data": results}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+
 
 
 if __name__ == "__main__":

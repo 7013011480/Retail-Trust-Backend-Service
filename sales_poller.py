@@ -5,6 +5,7 @@ import time
 import logging
 from datetime import datetime, timedelta
 import os
+import ssl
 import truststore
 
 class SalesPoller:
@@ -81,14 +82,9 @@ class SalesPoller:
                 # Parse timestamp
                 bill_date = bill.get("billDate", "")
                 bill_time_str = bill.get("billTime", "")
-                session_time = time.time() # Default to now
+                session_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                 if bill_date and bill_time_str:
-                    try:
-                        dt_str = f"{bill_date} {bill_time_str}"
-                        dt = datetime.strptime(dt_str, "%Y-%m-%d %H:%M:%S")
-                        session_time = dt.timestamp()
-                    except ValueError:
-                        pass
+                    session_time = f"{bill_date} {bill_time_str}"
 
                 # Extract amount - trying standard fields, default 0
                 total_amount = float(bill.get("actualBillAmt", 0.0))
@@ -108,7 +104,7 @@ class SalesPoller:
                     "SellerWindowId": seller_window_id,
                     "BillDate": bill_date,
                     "SessionTime": session_time,
-                    "ModeOfTransaction": payment_mode,
+                    # "ModeOfTransaction": payment_mode,
                     "TransactionTotal": total_amount,  # API might not return this here, assuming 0 if not found
                     "DiscountPercent": 0.0,
                     "RefundAmount": 0.0,

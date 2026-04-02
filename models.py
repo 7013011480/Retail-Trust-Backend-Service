@@ -30,9 +30,9 @@ class VASEvent(BaseModel):
     SellerWindowId: str
     SessionId: str
     BillDate: str # YYYY-MM-DD
-    SessionStart: float # Unix Timestamp
-    SessionEnd: float # Unix Timestamp
-    ModeOfTransaction: TransactionMode
+    SessionStart: str # IST Timestamp String
+    SessionEnd: str # IST Timestamp String
+ #   ModeOfTransaction: TransactionMode
     ReceiptGenerationStatus: bool = Field(..., description="true if receipt generated, false otherwise")
 
 class POSEvent(BaseModel):
@@ -41,8 +41,8 @@ class POSEvent(BaseModel):
     POSId: str
     SellerWindowId: Optional[str] = None
     BillDate: str
-    SessionTime: float
-    ModeOfTransaction: str # Changed from enum to str to be more flexible with "Phonepe" etc.
+    SessionTime: str
+    #ModeOfTransaction: str # Changed from enum to str to be more flexible with "Phonepe" etc.
     TransactionTotal: float = Field(default=0.0)
     DiscountPercent: float = Field(default=0.0)
     RefundAmount: float = Field(default=0.0)
