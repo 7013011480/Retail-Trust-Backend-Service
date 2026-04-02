@@ -111,7 +111,7 @@ class SalesPoller:
                 if total_amount > 0 and disc_amt > 0:
                     discount_percent = (disc_amt / total_amount) * 100
 
-                store_id = bill.get("ndcin", self.cin)
+                store_id = bill.get("ndcin", "Unknown")
                 pos_id = bill.get("terminalName", "Unknown")
 
                 # Resolve SellerWindowId from mapping
@@ -258,7 +258,7 @@ class SalesPoller:
             if total_amount > 0 and disc_amt > 0:
                 discount_percent = (disc_amt / total_amount) * 100
 
-            store_id = bill.get("ndcin", self.cin)
+            store_id = bill.get("ndcin", "Unknown")
             pos_id = bill.get("terminalName", "Unknown")
 
             mapping_key = f"{store_id}_{pos_id}"
