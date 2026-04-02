@@ -86,16 +86,23 @@ class SalesPoller:
                 if bill_date and bill_time_str:
                     session_time = f"{bill_date} {bill_time_str}"
 
-                # Extract amount - trying standard fields, default 0
+                # Extract amounts from API
                 total_amount = float(bill.get("actualBillAmt", 0.0))
-                
+                disc_amt = float(bill.get("discAmt", 0.0))
+                return_amt = float(bill.get("returnAmt", 0.0))
+
+                # Calculate discount percentage from discount amount
+                discount_percent = 0.0
+                if total_amount > 0 and disc_amt > 0:
+                    discount_percent = (disc_amt / total_amount) * 100
+
                 store_id = bill.get("ndcin", self.cin)
                 pos_id = bill.get("terminalName", "Unknown")
-                
+
                 # Resolve SellerWindowId from mapping
                 mapping_key = f"{store_id}_{pos_id}"
                 seller_window_id = self.mapping.get(mapping_key, "Unknown")
-                
+
                 # Create POSEvent dict
                 event = {
                     "StoreId": store_id,
@@ -104,12 +111,12 @@ class SalesPoller:
                     "SellerWindowId": seller_window_id,
                     "BillDate": bill_date,
                     "SessionTime": session_time,
-                    # "ModeOfTransaction": payment_mode,
-                    "TransactionTotal": total_amount,  # API might not return this here, assuming 0 if not found
-                    "DiscountPercent": 0.0,
-                    "RefundAmount": 0.0,
-                    
-                    # Extra fields for debugging/reference
+                    "ModeOfTransaction": payment_mode,
+                    "TransactionTotal": total_amount,
+                    "DiscountPercent": round(discount_percent, 2),
+                    "RefundAmount": return_amt,
+                    "IsComplementary": bill.get("isComplementary", "No"),
+                    "BillStatus": bill.get("status", "Completed"),
                     "billNo": bill.get("billNo")
                 }
                 processed_data.append(event)

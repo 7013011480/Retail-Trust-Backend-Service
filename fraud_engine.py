@@ -170,12 +170,12 @@ class FraudEngine:
         triggered_rules = []
         risk_level = "Low"
 
-        # Rule 1: Payment Mode Mismatch
-        # vas_mode = str(vas.ModeOfTransaction.value).lower()
-        # pos_mode = str(pos.ModeOfTransaction).lower()
-        
-        # if vas_mode != pos_mode:
-        #     triggered_rules.append(f"Payment Mode Mismatch (VAS: {vas.ModeOfTransaction.value}, POS: {pos.ModeOfTransaction})")
+        # Rule 1: Payment Mode Mismatch (when VAS provides payment mode)
+        if hasattr(vas, 'ModeOfTransaction') and vas.ModeOfTransaction:
+            vas_mode = str(vas.ModeOfTransaction).lower()
+            pos_mode = str(pos.ModeOfTransaction).lower()
+            if vas_mode != "unknown" and pos_mode != "unknown" and vas_mode != pos_mode:
+                triggered_rules.append(f"Payment Mode Mismatch (VAS: {vas_mode}, POS: {pos_mode})")
 
         # Rule 2: Bill not generated
         if not vas.ReceiptGenerationStatus:
@@ -183,11 +183,15 @@ class FraudEngine:
 
         # Rule 3: High Discount
         if pos.DiscountPercent > 20:
-             triggered_rules.append(f"High Discount ({pos.DiscountPercent}%)")
+            triggered_rules.append(f"High Discount ({pos.DiscountPercent}%)")
 
         # Rule 4: Refund
         if pos.RefundAmount > 0:
-            triggered_rules.append(f"Refund Processed ({pos.RefundAmount})")
+            triggered_rules.append(f"Refund Processed (Rs.{pos.RefundAmount})")
+
+        # Rule 5: Complementary order
+        if hasattr(pos, 'IsComplementary') and pos.IsComplementary == "Yes":
+            triggered_rules.append("Complementary Order")
 
         # Determine Risk
         if any("Mismatch" in r for r in triggered_rules):

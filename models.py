@@ -42,10 +42,12 @@ class POSEvent(BaseModel):
     SellerWindowId: Optional[str] = None
     BillDate: str
     SessionTime: str
-    #ModeOfTransaction: str # Changed from enum to str to be more flexible with "Phonepe" etc.
+    ModeOfTransaction: str = Field(default="Unknown")
     TransactionTotal: float = Field(default=0.0)
     DiscountPercent: float = Field(default=0.0)
     RefundAmount: float = Field(default=0.0)
+    IsComplementary: str = Field(default="No")
+    BillStatus: str = Field(default="Completed")
     
     # Allow extra fields from JSON
     class Config:
