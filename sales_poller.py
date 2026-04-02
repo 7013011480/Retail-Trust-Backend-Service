@@ -160,6 +160,104 @@ class SalesPoller:
                 json.dump(final_list, f, indent=4)
             print(f"Added {added_count} new bills to {self.output_file}")
 
+    async def fetch_historical(self, days: int = 10) -> dict:
+        """Fetches historical sales data for the last N days. Returns processed events and raw bills."""
+        all_events = []
+        raw_bills = []
+        now = datetime.now()
+        ctx = truststore.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
+
+        for day_offset in range(days, 0, -1):
+            day_start = now - timedelta(days=day_offset)
+            day_end = now - timedelta(days=day_offset - 1)
+            from_ts = str(int(day_start.timestamp()))
+            to_ts = str(int(day_end.timestamp()))
+
+            page = 1
+            while True:
+                payload = {
+                    "cin": self.cin,
+                    "from": from_ts,
+                    "to": to_ts,
+                    "pageNo": str(page)
+                }
+                try:
+                    async with httpx.AsyncClient(verify=ctx, timeout=30.0) as client:
+                        response = await client.post(self.api_url, headers=self.headers, json=payload)
+
+                    if response.status_code == 200:
+                        data = response.json()
+                        if data.get("response") and "data" in data and "bills" in data["data"]:
+                            bills = data["data"]["bills"]
+                            if not bills:
+                                break
+                            for bill in bills:
+                                event = self._bill_to_event(bill)
+                                if event:
+                                    all_events.append(event)
+                                    raw_bills.append(bill)
+
+                            page_count = data["data"].get("pageCount", 1)
+                            if page >= page_count:
+                                break
+                            page += 1
+                        else:
+                            break
+                    else:
+                        print(f"Historical fetch failed for day -{day_offset}: {response.status_code}")
+                        break
+                except Exception as e:
+                    print(f"Error fetching historical data for day -{day_offset}: {e}")
+                    break
+
+        print(f"Fetched {len(all_events)} historical bills over {days} days")
+        return {"events": all_events, "raw_bills": raw_bills}
+
+    def _bill_to_event(self, bill: dict) -> dict | None:
+        """Convert a raw API bill into a POSEvent dict."""
+        try:
+            pay_modes = bill.get("payModes", [])
+            payment_mode = pay_modes[0].get("mode") if pay_modes else "Unknown"
+
+            bill_date = bill.get("billDate", "")
+            bill_time_str = bill.get("billTime", "")
+            session_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            if bill_date and bill_time_str:
+                session_time = f"{bill_date} {bill_time_str}"
+
+            total_amount = float(bill.get("actualBillAmt", 0.0))
+            disc_amt = float(bill.get("discAmt", 0.0))
+            return_amt = float(bill.get("returnAmt", 0.0))
+
+            discount_percent = 0.0
+            if total_amount > 0 and disc_amt > 0:
+                discount_percent = (disc_amt / total_amount) * 100
+
+            store_id = bill.get("ndcin", self.cin)
+            pos_id = bill.get("terminalName", "Unknown")
+
+            mapping_key = f"{store_id}_{pos_id}"
+            seller_window_id = self.mapping.get(mapping_key, "Unknown")
+
+            return {
+                "StoreId": store_id,
+                "CashierName": bill.get("cashierName", "Unknown"),
+                "POSId": pos_id,
+                "SellerWindowId": seller_window_id,
+                "BillDate": bill_date,
+                "SessionTime": session_time,
+                "ModeOfTransaction": payment_mode,
+                "TransactionTotal": total_amount,
+                "DiscountPercent": round(discount_percent, 2),
+                "RefundAmount": return_amt,
+                "IsComplementary": bill.get("isComplementary", "No"),
+                "BillStatus": bill.get("status", "Completed"),
+                "billNo": bill.get("billNo")
+            }
+        except Exception as e:
+            print(f"Error processing bill {bill.get('billNo')}: {e}")
+            return None
+
     async def start_polling(self, interval_seconds: int = 120):
         """Starts the polling loop."""
         while True:

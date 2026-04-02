@@ -8,9 +8,12 @@ import os
 import time
 from concurrent.futures import ThreadPoolExecutor
 
+from datetime import datetime, timedelta, timezone
 from fraud_engine import FraudEngine
-from models import Transaction, VASEvent, POSEvent
+from models import Transaction, VASEvent, POSEvent, TransactionStatus
 from sales_poller import SalesPoller
+
+IST = timezone(timedelta(hours=5, minutes=30))
 
 
 app = FastAPI(title="Retail Trust & Security Backend")
@@ -162,8 +165,61 @@ async def validate_transaction(transaction_id: str, decision: str, notes: str = 
     await manager.broadcast(json.dumps(message))
     
     return {"status": "success"}
-    
 
+
+@app.get("/api/history")
+async def get_historical_data(days: int = 10):
+    """Fetch historical POS data from the API and classify with POS-only rules."""
+    poller = SalesPoller(storage_path=pos_file_path)
+    result = await poller.fetch_historical(days=days)
+    events = result["events"]
+    raw_bills = result["raw_bills"]
+
+    transactions = []
+    bills_map = {}
+
+    for i, (event, bill) in enumerate(zip(events, raw_bills)):
+        bill_no = event.get("billNo", str(i))
+        txn_id = f"TXN-{bill_no}"
+
+        triggered_rules = []
+        if event.get("DiscountPercent", 0) > 20:
+            triggered_rules.append(f"High Discount ({event['DiscountPercent']}%)")
+        if event.get("RefundAmount", 0) > 0:
+            triggered_rules.append(f"Refund Processed (Rs.{event['RefundAmount']})")
+        if event.get("IsComplementary") == "Yes":
+            triggered_rules.append("Complementary Order")
+
+        risk_level = "Medium" if triggered_rules else "Low"
+        status = "suspicious" if triggered_rules else "genuine"
+
+        session_time = event.get("SessionTime", "")
+        try:
+            ts = datetime.strptime(session_time, "%Y-%m-%d %H:%M:%S").replace(tzinfo=IST).isoformat()
+        except:
+            ts = datetime.now(IST).isoformat()
+
+        cam_id = event.get("SellerWindowId", "Unknown")
+
+        transactions.append({
+            "id": txn_id,
+            "shop_id": event.get("StoreId", "Unknown"),
+            "cam_id": cam_id,
+            "pos_id": event.get("POSId", "Unknown"),
+            "cashier_name": event.get("CashierName", "Unknown"),
+            "timestamp": ts,
+            "transaction_total": event.get("TransactionTotal", 0),
+            "risk_level": risk_level,
+            "triggered_rules": triggered_rules if triggered_rules else None,
+            "status": status,
+            "fraud_category": triggered_rules[0] if triggered_rules else None,
+        })
+        bills_map[txn_id] = bill
+
+    return {
+        "transactions": transactions,
+        "bills_map": bills_map
+    }
 
 
 if __name__ == "__main__":
