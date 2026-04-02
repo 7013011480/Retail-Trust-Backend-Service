@@ -9,7 +9,7 @@ import time
 from concurrent.futures import ThreadPoolExecutor
 
 from datetime import datetime, timedelta, timezone
-from fraud_engine import FraudEngine, load_rule_config, RULE_CONFIG_FILE
+from fraud_engine import FraudEngine, load_rule_config, RULE_CONFIG_FILE, SALES_DATA_FILE
 from models import Transaction, VASEvent, POSEvent, TransactionStatus
 from sales_poller import SalesPoller
 
@@ -48,13 +48,40 @@ class ConnectionManager:
 
 manager = ConnectionManager()
 
+# Persistence files
+TRANSACTIONS_FILE = "transactions.jsonl"
+ALERTS_FILE = "alerts.jsonl"
+
+def append_jsonl(filepath: str, record: dict):
+    """Append a single JSON record as a line to a JSONL file."""
+    with open(filepath, "a") as f:
+        f.write(json.dumps(record) + "\n")
+
+def read_jsonl(filepath: str) -> list:
+    """Read all records from a JSONL file."""
+    records = []
+    if os.path.exists(filepath):
+        with open(filepath, "r") as f:
+            for line in f:
+                line = line.strip()
+                if line:
+                    try:
+                        records.append(json.loads(line))
+                    except json.JSONDecodeError:
+                        pass
+    return records
+
 async def broadcast_update(type: str, data: any):
-    """Callback for FraudEngine to send updates to frontend"""
-    message = {
-        "type": type,
-        "data": data.model_dump(mode='json')
-    }
+    """Callback for FraudEngine to send updates to frontend. Also persists to JSONL."""
+    record = data.model_dump(mode='json')
+    message = {"type": type, "data": record}
     await manager.broadcast(json.dumps(message))
+
+    # Persist
+    if type == "NEW_TRANSACTION":
+        append_jsonl(TRANSACTIONS_FILE, record)
+    elif type == "NEW_ALERT":
+        append_jsonl(ALERTS_FILE, record)
 
 # Synchronization for POS file access
 pos_lock = asyncio.Lock()
@@ -82,6 +109,86 @@ async def scheduled_data_processor():
         
         # Wait 2 minutes
         await asyncio.sleep(120)
+
+async def idle_pos_monitor():
+    """
+    Background task to detect idle POS terminals.
+    Fires an alert if no transaction has been processed for longer than the configured threshold.
+    """
+    print("Starting Idle POS Monitor...")
+    # Track last known transaction time per POS
+    last_txn_time: dict[str, datetime] = {}
+    alerted_idle: set[str] = set()  # Don't re-alert for the same idle period
+
+    while True:
+        try:
+            config = load_rule_config()
+            idle_minutes = config.get("idle_pos_minutes", 30)
+
+            # Read processed POS events to find latest transaction per POS
+            if os.path.exists(SALES_DATA_FILE):
+                with open(SALES_DATA_FILE, "r") as f:
+                    content = f.read()
+                    if content:
+                        events = json.loads(content)
+                        for evt in events:
+                            pos_key = f"{evt.get('StoreId', 'Unknown')}_{evt.get('POSId', 'Unknown')}"
+                            try:
+                                ts = datetime.strptime(evt.get("SessionTime", ""), "%Y-%m-%d %H:%M:%S").replace(tzinfo=IST)
+                                if pos_key not in last_txn_time or ts > last_txn_time[pos_key]:
+                                    last_txn_time[pos_key] = ts
+                            except:
+                                pass
+
+            # Also check pending POS data
+            if os.path.exists(pos_file_path):
+                with open(pos_file_path, "r") as f:
+                    content = f.read()
+                    if content:
+                        events = json.loads(content)
+                        for evt in events:
+                            pos_key = f"{evt.get('StoreId', 'Unknown')}_{evt.get('POSId', 'Unknown')}"
+                            try:
+                                ts = datetime.strptime(evt.get("SessionTime", ""), "%Y-%m-%d %H:%M:%S").replace(tzinfo=IST)
+                                if pos_key not in last_txn_time or ts > last_txn_time[pos_key]:
+                                    last_txn_time[pos_key] = ts
+                            except:
+                                pass
+
+            now = datetime.now(IST)
+            for pos_key, last_ts in last_txn_time.items():
+                gap_minutes = (now - last_ts).total_seconds() / 60
+                if gap_minutes >= idle_minutes and pos_key not in alerted_idle:
+                    store_id, pos_id = pos_key.split("_", 1) if "_" in pos_key else (pos_key, "Unknown")
+                    alert_data = {
+                        "type": "NEW_TRANSACTION",
+                        "data": {
+                            "id": f"TXN-IDLE-{pos_key}-{int(now.timestamp())}",
+                            "shop_id": store_id,
+                            "cam_id": "N/A",
+                            "pos_id": pos_id,
+                            "cashier_name": "N/A",
+                            "timestamp": now.isoformat(),
+                            "transaction_total": 0,
+                            "risk_level": "Medium",
+                            "triggered_rules": [f"POS Idle for {int(gap_minutes)} minutes"],
+                            "status": "suspicious",
+                            "fraud_category": "POS Idle",
+                        }
+                    }
+                    await manager.broadcast(json.dumps(alert_data))
+                    append_jsonl(TRANSACTIONS_FILE, alert_data["data"])
+                    alerted_idle.add(pos_key)
+                    print(f"[Idle Monitor] Alert: {pos_key} idle for {int(gap_minutes)} minutes")
+                elif gap_minutes < idle_minutes and pos_key in alerted_idle:
+                    # POS is active again, allow future alerts
+                    alerted_idle.discard(pos_key)
+
+        except Exception as e:
+            print(f"Error in idle POS monitor: {e}")
+
+        await asyncio.sleep(60)  # Check every minute
+
 
 async def scheduled_stream_broadcaster():
     """
@@ -134,6 +241,9 @@ async def startup_event():
     # Start stream broadcaster
     asyncio.create_task(scheduled_stream_broadcaster())
 
+    # Start idle POS monitor
+    asyncio.create_task(idle_pos_monitor())
+
 @app.on_event("shutdown")
 def shutdown_event():
     pass
@@ -175,19 +285,44 @@ async def get_config():
 
 @app.post("/api/config")
 async def update_config(config: dict):
-    """Update rule configuration thresholds."""
+    """Update rule configuration thresholds. Clears persisted data so next /api/history re-classifies."""
     current = load_rule_config()
     current.update(config)
     with open(RULE_CONFIG_FILE, "w") as f:
         json.dump(current, f, indent=4)
+    # Clear persisted transactions so they get re-classified with new thresholds
+    for f_path in [TRANSACTIONS_FILE, ALERTS_FILE, "bills_raw.jsonl"]:
+        if os.path.exists(f_path):
+            os.remove(f_path)
+    print("[Config] Cleared persisted data for re-classification")
     return current
 
 
 @app.get("/api/history")
 async def get_historical_data(days: int = 10):
-    """Fetch historical POS data from the API and classify with POS-only rules."""
+    """Fetch new POS data from the API since last saved transaction and classify."""
+    # Find the latest timestamp in our persisted data
+    existing = read_jsonl(TRANSACTIONS_FILE)
+    last_ts = None
+    if existing:
+        timestamps = [r.get("timestamp", "") for r in existing if r.get("timestamp")]
+        if timestamps:
+            last_ts = max(timestamps)
+
     poller = SalesPoller(storage_path=pos_file_path)
-    result = await poller.fetch_historical(days=days)
+
+    if last_ts:
+        # Only fetch from last timestamp onwards
+        try:
+            last_dt = datetime.fromisoformat(last_ts)
+            days_since = max(1, (datetime.now(IST) - last_dt).days + 1)
+            print(f"[History] Fetching {days_since} days since last transaction: {last_ts}")
+            result = await poller.fetch_historical(days=days_since)
+        except:
+            result = await poller.fetch_historical(days=days)
+    else:
+        # No existing data, fetch full range
+        result = await poller.fetch_historical(days=days)
     events = result["events"]
     raw_bills = result["raw_bills"]
 
@@ -264,6 +399,37 @@ async def get_historical_data(days: int = 10):
 
     # Sort latest first
     transactions.sort(key=lambda t: t["timestamp"], reverse=True)
+
+    # Persist to JSONL (deduplicate by txn_id)
+    existing_ids = {r.get("id") for r in read_jsonl(TRANSACTIONS_FILE)}
+    new_count = 0
+    for txn in transactions:
+        if txn["id"] not in existing_ids:
+            append_jsonl(TRANSACTIONS_FILE, txn)
+            # Also persist raw bill
+            if txn["id"] in bills_map:
+                append_jsonl("bills_raw.jsonl", {"txn_id": txn["id"], "bill": bills_map[txn["id"]]})
+            new_count += 1
+
+    print(f"[History] Persisted {new_count} new transactions to {TRANSACTIONS_FILE}")
+
+    return {
+        "transactions": transactions,
+        "bills_map": bills_map
+    }
+
+
+@app.get("/api/transactions")
+async def get_transactions():
+    """Get all persisted transactions from local JSONL (no external API call)."""
+    transactions = read_jsonl(TRANSACTIONS_FILE)
+    # Sort latest first
+    transactions.sort(key=lambda t: t.get("timestamp", ""), reverse=True)
+
+    # Load raw bills map
+    bills_map = {}
+    for record in read_jsonl("bills_raw.jsonl"):
+        bills_map[record.get("txn_id", "")] = record.get("bill", {})
 
     return {
         "transactions": transactions,

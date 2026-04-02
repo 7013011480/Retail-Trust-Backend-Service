@@ -3,7 +3,9 @@ import httpx
 import json
 import time
 import logging
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
+
+_IST = timezone(timedelta(hours=5, minutes=30))
 import os
 import ssl
 import truststore
@@ -38,7 +40,7 @@ class SalesPoller:
 
     async def fetch_sales(self):
         """Fetches sales data from the API."""
-        now = datetime.now()
+        now = datetime.now(_IST)
         to_time = int(now.timestamp())
         from_time = int((now - timedelta(minutes=2)).timestamp())
 
@@ -167,7 +169,7 @@ class SalesPoller:
         """Fetches historical sales data for the last N days. Returns processed events and raw bills."""
         all_events = []
         raw_bills = []
-        now = datetime.now()
+        now = datetime.now(_IST)
         ctx = truststore.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
 
         for day_offset in range(days, 0, -1):
