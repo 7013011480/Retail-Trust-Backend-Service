@@ -212,7 +212,7 @@ class FraudEngine:
         transaction = Transaction(
             id=transaction_id,
             shop_id=vas.StoreId,
-            cam_id=vas.CamId,
+            cam_id=vas.SellerWindowId,
             pos_id=pos.POSId,
             cashier_name=pos.CashierName,
             timestamp=datetime.strptime(pos.SessionTime, "%Y-%m-%d %H:%M:%S").replace(tzinfo=IST),
@@ -250,7 +250,7 @@ class FraudEngine:
             t_id = f"TXN-{vas.SessionId}-MISSING"
             timestamp = datetime.strptime(vas.SessionEnd, "%Y-%m-%d %H:%M:%S").replace(tzinfo=IST)
             shop_id = vas.StoreId
-            cam_id = vas.CamId
+            cam_id = vas.SellerWindowId
             pos_id = "Unknown"
             cashier = "Unknown"
             total = 0.0
