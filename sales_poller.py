@@ -135,6 +135,8 @@ class SalesPoller:
                     "VoidReason": bill.get("voidReason", ""),
                     "CancelDate": bill.get("cancelDate", ""),
                     "ItemCount": sum(item.get("qty", 1) for item in bill.get("items", [])),
+                    "BillAmount": float(bill.get("billAmt", total_amount)),
+                    "PaymentReceived": sum(float(pm.get("amt", 0)) for pm in pay_modes),
                     "billNo": bill.get("billNo")
                 }
                 processed_data.append(event)
@@ -280,6 +282,8 @@ class SalesPoller:
                 "VoidReason": bill.get("voidReason", ""),
                 "CancelDate": bill.get("cancelDate", ""),
                 "ItemCount": sum(item.get("qty", 1) for item in bill.get("items", [])),
+                "BillAmount": float(bill.get("billAmt", total_amount)),
+                "PaymentReceived": sum(float(pm.get("amt", 0)) for pm in pay_modes),
                 "billNo": bill.get("billNo")
             }
         except Exception as e:

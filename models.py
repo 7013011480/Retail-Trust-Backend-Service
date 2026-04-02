@@ -51,6 +51,8 @@ class POSEvent(BaseModel):
     VoidReason: str = Field(default="")
     CancelDate: str = Field(default="")
     ItemCount: int = Field(default=0)
+    BillAmount: float = Field(default=0.0)
+    PaymentReceived: float = Field(default=0.0)
     
     # Allow extra fields from JSON
     class Config:

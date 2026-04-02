@@ -363,10 +363,17 @@ async def get_historical_data(days: int = 10):
         if event.get("DiscountPercent", 0) > config["discount_threshold_percent"]:
             triggered_rules.append(f"High Discount ({event['DiscountPercent']}%)")
 
-        # Rule: Refund (only for non-cash — cash returnAmt is just change given back)
+        # Rule: Refund — for cash, only flag excess change; for non-cash, flag all
         pay_mode = str(event.get("ModeOfTransaction", "unknown")).lower()
-        if event.get("RefundAmount", 0) > config["refund_amount_threshold"] and pay_mode != "cash":
-            triggered_rules.append(f"Refund Processed (Rs.{event['RefundAmount']})")
+        refund_amt = event.get("RefundAmount", 0)
+        if refund_amt > config["refund_amount_threshold"]:
+            if pay_mode == "cash":
+                expected_change = max(0, event.get("PaymentReceived", 0) - event.get("BillAmount", 0))
+                excess = refund_amt - expected_change
+                if excess > 1:
+                    triggered_rules.append(f"Excess Cash Return (Rs.{excess:.0f} over expected change)")
+            else:
+                triggered_rules.append(f"Refund Processed (Rs.{refund_amt})")
 
         # Rule: Complementary Order
         if event.get("IsComplementary") == "Yes":

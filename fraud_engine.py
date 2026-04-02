@@ -226,10 +226,17 @@ class FraudEngine:
             triggered_rules.append(f"High Discount ({pos.DiscountPercent}%)")
 
         # Rule 4: Refund (configurable threshold)
-        # Only flag refunds for non-cash payments (cash returnAmt is just change given back)
+        # Refund logic: for cash, only flag excess change; for non-cash, flag all refunds
         pos_mode = str(pos.ModeOfTransaction).lower() if hasattr(pos, 'ModeOfTransaction') else "unknown"
-        if pos.RefundAmount > config["refund_amount_threshold"] and pos_mode != "cash":
-            triggered_rules.append(f"Refund Processed (Rs.{pos.RefundAmount})")
+        if pos.RefundAmount > config["refund_amount_threshold"]:
+            if pos_mode == "cash":
+                # Check for excess change: returnAmt > (payment received - bill amount)
+                expected_change = max(0, pos.PaymentReceived - pos.BillAmount) if hasattr(pos, 'PaymentReceived') and hasattr(pos, 'BillAmount') else pos.RefundAmount
+                excess = pos.RefundAmount - expected_change
+                if excess > 1:  # >₹1 tolerance for rounding
+                    triggered_rules.append(f"Excess Cash Return (Rs.{excess:.0f} over expected change)")
+            else:
+                triggered_rules.append(f"Refund Processed (Rs.{pos.RefundAmount})")
 
         # Rule 5: Complementary order
         if hasattr(pos, 'IsComplementary') and pos.IsComplementary == "Yes":
