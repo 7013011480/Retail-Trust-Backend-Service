@@ -3,12 +3,6 @@ from typing import Optional, List
 from datetime import datetime
 from enum import Enum
 
-class TransactionMode(str, Enum):
-    CASH = "Cash"
-    CARD = "Card"
-    UPI = "UPI"
-    PHONEPE = "Phonepe"
-
 class TransactionStatus(str, Enum):
     GENUINE = "genuine"
     FRAUDULENT = "fraudulent"
@@ -29,10 +23,9 @@ class VASEvent(BaseModel):
     CamId: str
     SellerWindowId: str
     SessionId: str
-    BillDate: str # YYYY-MM-DD
-    SessionStart: str # IST Timestamp String
-    SessionEnd: str # IST Timestamp String
- #   ModeOfTransaction: TransactionMode
+    BillDate: str
+    SessionStart: str
+    SessionEnd: str
     ReceiptGenerationStatus: bool = Field(..., description="true if receipt generated, false otherwise")
 
 class POSEvent(BaseModel):
@@ -53,21 +46,21 @@ class POSEvent(BaseModel):
     ItemCount: int = Field(default=0)
     BillAmount: float = Field(default=0.0)
     PaymentReceived: float = Field(default=0.0)
-    
-    # Allow extra fields from JSON
+
     class Config:
         extra = "ignore"
 
-# Output Models (Matching Frontend)
+# Output Models
 class Transaction(BaseModel):
     id: str
     shop_id: str
+    shop_name: str = ""
     cam_id: str
     pos_id: str
     cashier_name: str
     timestamp: datetime
     transaction_total: float
-    risk_level: str = "Low" # High, Medium, Low
+    risk_level: str = "Low"
     triggered_rules: List[str] = []
     status: TransactionStatus = TransactionStatus.PENDING
     fraud_category: Optional[str] = None
@@ -82,8 +75,9 @@ class Alert(BaseModel):
     id: str
     transaction_id: str
     shop_id: str
+    shop_name: str = ""
     cashier_name: str
-    risk_level: str # High, Medium, Low
+    risk_level: str
     triggered_rules: List[str] = []
     timestamp: datetime
     status: AlertStatus = AlertStatus.NEW

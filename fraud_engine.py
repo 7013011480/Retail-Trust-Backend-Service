@@ -6,7 +6,7 @@ from datetime import datetime, timedelta, timezone
 
 IST = timezone(timedelta(hours=5, minutes=30))
 from typing import Dict, Optional, List, Callable
-from models import VASEvent, POSEvent, Transaction, Alert, TransactionStatus, AlertStatus #, TransactionMode
+from models import VASEvent, POSEvent, Transaction, Alert, TransactionStatus, AlertStatus
 # from utils import acquire_file_lock
 
 # File Constants
@@ -46,11 +46,24 @@ def _load_camera_stores() -> set:
         pass
     return stores
 
+def _load_store_names() -> dict:
+    """Load store CIN -> name mapping."""
+    names = {}
+    try:
+        if os.path.exists("stores.json"):
+            with open("stores.json", "r") as f:
+                for s in json.load(f):
+                    names[s["cin"]] = s.get("name", s["cin"])
+    except Exception:
+        pass
+    return names
+
 class FraudEngine:
     def __init__(self, update_callback: Callable, pos_lock: asyncio.Lock):
         self.update_callback = update_callback
         self.pos_lock = pos_lock
         self.camera_stores = _load_camera_stores()
+        self.store_names = _load_store_names()
 
     def _ist_to_unix(self, ist_str: str) -> float:
         """Helper to convert IST timestamp string to Unix timestamp."""
@@ -277,6 +290,7 @@ class FraudEngine:
         transaction = Transaction(
             id=transaction_id,
             shop_id=vas.StoreId,
+            shop_name=self.store_names.get(vas.StoreId, vas.StoreId),
             cam_id=vas.SellerWindowId,
             pos_id=pos.POSId,
             cashier_name=pos.CashierName,
@@ -327,6 +341,7 @@ class FraudEngine:
             id=alert_id,
             transaction_id="N/A",
             shop_id=shop_id,
+            shop_name=self.store_names.get(shop_id, shop_id),
             cashier_name=cashier,
             risk_level=risk_level,
             triggered_rules=triggered_rules,
@@ -357,6 +372,7 @@ class FraudEngine:
             id=f"ALT-{uuid.uuid4().hex[:6].upper()}",
             transaction_id=transaction_id,
             shop_id=shop_id,
+            shop_name=self.store_names.get(shop_id, shop_id),
             cashier_name=cashier,
             risk_level=risk_level,
             triggered_rules=rules,

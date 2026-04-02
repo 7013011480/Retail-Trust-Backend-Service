@@ -5,8 +5,6 @@ from typing import List, Set
 import uvicorn
 import json
 import os
-import time
-from concurrent.futures import ThreadPoolExecutor
 
 from datetime import datetime, timedelta, timezone
 from fraud_engine import FraudEngine, load_rule_config, RULE_CONFIG_FILE, SALES_DATA_FILE
@@ -51,25 +49,55 @@ manager = ConnectionManager()
 # Persistence files
 TRANSACTIONS_FILE = "transactions.jsonl"
 ALERTS_FILE = "alerts.jsonl"
+BILLS_RAW_FILE = BILLS_RAW_FILE
+
+import threading
+_jsonl_lock = threading.Lock()
 
 def append_jsonl(filepath: str, record: dict):
-    """Append a single JSON record as a line to a JSONL file."""
-    with open(filepath, "a") as f:
-        f.write(json.dumps(record) + "\n")
+    """Append a single JSON record as a line to a JSONL file (thread-safe)."""
+    with _jsonl_lock:
+        with open(filepath, "a") as f:
+            f.write(json.dumps(record) + "\n")
 
 def read_jsonl(filepath: str) -> list:
     """Read all records from a JSONL file."""
     records = []
     if os.path.exists(filepath):
-        with open(filepath, "r") as f:
-            for line in f:
-                line = line.strip()
-                if line:
-                    try:
-                        records.append(json.loads(line))
-                    except json.JSONDecodeError:
-                        pass
+        with _jsonl_lock:
+            with open(filepath, "r") as f:
+                for line in f:
+                    line = line.strip()
+                    if line:
+                        try:
+                            records.append(json.loads(line))
+                        except json.JSONDecodeError:
+                            pass
     return records
+
+def update_jsonl_record(filepath: str, record_id: str, updates: dict):
+    """Update a record in a JSONL file by its 'id' field (thread-safe)."""
+    with _jsonl_lock:
+        records = []
+        if os.path.exists(filepath):
+            with open(filepath, "r") as f:
+                for line in f:
+                    line = line.strip()
+                    if line:
+                        try:
+                            records.append(json.loads(line))
+                        except json.JSONDecodeError:
+                            pass
+        updated = False
+        for r in records:
+            if r.get("id") == record_id:
+                r.update(updates)
+                updated = True
+                break
+        if updated:
+            with open(filepath, "w") as f:
+                for r in records:
+                    f.write(json.dumps(r) + "\n")
 
 async def broadcast_update(type: str, data: any):
     """Callback for FraudEngine to send updates to frontend. Also persists to JSONL."""
@@ -265,19 +293,19 @@ async def websocket_endpoint(websocket: WebSocket):
 @app.post("/api/admin/validate")
 async def validate_transaction(transaction_id: str, decision: str, notes: str = ""):
     print(f"Admin Decision: {transaction_id} -> {decision} ({notes})")
-    
-    update_data = {
-        "id": transaction_id,
-        "status": decision,
-        "notes": notes
-    }
-    
-    message = {
-        "type": "TRANSACTION_UPDATE",
-        "data": update_data
-    }
-    await manager.broadcast(json.dumps(message))
-    
+
+    update_data = {"id": transaction_id, "status": decision, "notes": notes}
+    await manager.broadcast(json.dumps({"type": "TRANSACTION_UPDATE", "data": update_data}))
+
+    # Persist: update transaction status in JSONL
+    update_jsonl_record(TRANSACTIONS_FILE, transaction_id, {"status": decision, "notes": notes})
+
+    # Persist: update matching alert status in JSONL
+    for alert in read_jsonl(ALERTS_FILE):
+        if alert.get("transaction_id") == transaction_id:
+            update_jsonl_record(ALERTS_FILE, alert["id"], {"status": decision})
+            break
+
     return {"status": "success"}
 
 
@@ -307,7 +335,7 @@ async def update_config(config: dict):
     with open(RULE_CONFIG_FILE, "w") as f:
         json.dump(current, f, indent=4)
     # Clear persisted transactions so they get re-classified with new thresholds
-    for f_path in [TRANSACTIONS_FILE, ALERTS_FILE, "bills_raw.jsonl"]:
+    for f_path in [TRANSACTIONS_FILE, ALERTS_FILE, BILLS_RAW_FILE]:
         if os.path.exists(f_path):
             os.remove(f_path)
     print("[Config] Cleared persisted data for re-classification")
@@ -436,15 +464,27 @@ async def get_historical_data(days: int = 5):
     # Sort latest first
     transactions.sort(key=lambda t: t["timestamp"], reverse=True)
 
-    # Persist to JSONL (deduplicate by txn_id)
-    existing_ids = {r.get("id") for r in read_jsonl(TRANSACTIONS_FILE)}
+    # Persist to JSONL (deduplicate by txn_id and billNo)
+    existing_records = read_jsonl(TRANSACTIONS_FILE)
+    existing_ids = {r.get("id") for r in existing_records}
+    # Also extract billNos from existing records to catch live-matched duplicates
+    existing_bill_nos = set()
+    for r in existing_records:
+        # Live transactions use TXN-{SessionId}, extract billNo from raw bills
+        rid = r.get("id", "")
+        if rid.startswith("TXN-") and not rid.startswith("TXN-IDLE"):
+            existing_ids.add(rid)
+    for br in read_jsonl(BILLS_RAW_FILE):
+        existing_bill_nos.add(br.get("bill", {}).get("billNo", ""))
+
     new_count = 0
     for txn in transactions:
-        if txn["id"] not in existing_ids:
+        bill_no = bills_map.get(txn["id"], {}).get("billNo", "")
+        if txn["id"] not in existing_ids and bill_no not in existing_bill_nos:
             append_jsonl(TRANSACTIONS_FILE, txn)
             # Also persist raw bill
             if txn["id"] in bills_map:
-                append_jsonl("bills_raw.jsonl", {"txn_id": txn["id"], "bill": bills_map[txn["id"]]})
+                append_jsonl(BILLS_RAW_FILE, {"txn_id": txn["id"], "bill": bills_map[txn["id"]]})
             new_count += 1
 
     # Also generate alerts for flagged transactions
@@ -483,7 +523,7 @@ async def get_transactions():
     transactions.sort(key=lambda t: t.get("timestamp", ""), reverse=True)
 
     bills_map = {}
-    for record in read_jsonl("bills_raw.jsonl"):
+    for record in read_jsonl(BILLS_RAW_FILE):
         bills_map[record.get("txn_id", "")] = record.get("bill", {})
 
     return {
