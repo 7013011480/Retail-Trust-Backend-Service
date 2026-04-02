@@ -117,6 +117,9 @@ class SalesPoller:
                     "RefundAmount": return_amt,
                     "IsComplementary": bill.get("isComplementary", "No"),
                     "BillStatus": bill.get("status", "Completed"),
+                    "VoidReason": bill.get("voidReason", ""),
+                    "CancelDate": bill.get("cancelDate", ""),
+                    "ItemCount": sum(item.get("qty", 1) for item in bill.get("items", [])),
                     "billNo": bill.get("billNo")
                 }
                 processed_data.append(event)
@@ -252,6 +255,9 @@ class SalesPoller:
                 "RefundAmount": return_amt,
                 "IsComplementary": bill.get("isComplementary", "No"),
                 "BillStatus": bill.get("status", "Completed"),
+                "VoidReason": bill.get("voidReason", ""),
+                "CancelDate": bill.get("cancelDate", ""),
+                "ItemCount": sum(item.get("qty", 1) for item in bill.get("items", [])),
                 "billNo": bill.get("billNo")
             }
         except Exception as e:

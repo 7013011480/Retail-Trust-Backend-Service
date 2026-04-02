@@ -9,7 +9,7 @@ import time
 from concurrent.futures import ThreadPoolExecutor
 
 from datetime import datetime, timedelta, timezone
-from fraud_engine import FraudEngine
+from fraud_engine import FraudEngine, load_rule_config, RULE_CONFIG_FILE
 from models import Transaction, VASEvent, POSEvent, TransactionStatus
 from sales_poller import SalesPoller
 
@@ -167,6 +167,22 @@ async def validate_transaction(transaction_id: str, decision: str, notes: str = 
     return {"status": "success"}
 
 
+@app.get("/api/config")
+async def get_config():
+    """Get current rule configuration thresholds."""
+    return load_rule_config()
+
+
+@app.post("/api/config")
+async def update_config(config: dict):
+    """Update rule configuration thresholds."""
+    current = load_rule_config()
+    current.update(config)
+    with open(RULE_CONFIG_FILE, "w") as f:
+        json.dump(current, f, indent=4)
+    return current
+
+
 @app.get("/api/history")
 async def get_historical_data(days: int = 10):
     """Fetch historical POS data from the API and classify with POS-only rules."""
@@ -178,20 +194,50 @@ async def get_historical_data(days: int = 10):
     transactions = []
     bills_map = {}
 
+    config = load_rule_config()
+
     for i, (event, bill) in enumerate(zip(events, raw_bills)):
         bill_no = event.get("billNo", str(i))
         txn_id = f"TXN-{bill_no}"
 
         triggered_rules = []
-        if event.get("DiscountPercent", 0) > 20:
+
+        # Rule: High Discount
+        if event.get("DiscountPercent", 0) > config["discount_threshold_percent"]:
             triggered_rules.append(f"High Discount ({event['DiscountPercent']}%)")
-        if event.get("RefundAmount", 0) > 0:
+
+        # Rule: Refund
+        if event.get("RefundAmount", 0) > config["refund_amount_threshold"]:
             triggered_rules.append(f"Refund Processed (Rs.{event['RefundAmount']})")
+
+        # Rule: Complementary Order
         if event.get("IsComplementary") == "Yes":
             triggered_rules.append("Complementary Order")
 
-        risk_level = "Medium" if triggered_rules else "Low"
-        status = "suspicious" if triggered_rules else "genuine"
+        # Rule: Void/Cancelled
+        if event.get("VoidReason"):
+            triggered_rules.append(f"Void Transaction ({event['VoidReason']})")
+        if event.get("CancelDate"):
+            triggered_rules.append("Cancelled Transaction")
+
+        # Rule: Negative Amount
+        total = event.get("TransactionTotal", 0)
+        if total < 0:
+            triggered_rules.append(f"Negative Amount (Rs.{total})")
+
+        # Rule: High Value
+        if total > config["high_value_threshold"]:
+            triggered_rules.append(f"High Value Transaction (Rs.{total})")
+
+        # Rule: Bulk Purchase
+        item_count = event.get("ItemCount", 0)
+        if item_count > config["bulk_quantity_threshold"]:
+            triggered_rules.append(f"Bulk Purchase ({item_count} items)")
+
+        # Determine risk
+        has_high = any(r for r in triggered_rules if "Void" in r or "Cancelled" in r or "Negative" in r)
+        risk_level = "High" if has_high else ("Medium" if triggered_rules else "Low")
+        status = "fraudulent" if risk_level == "High" else ("suspicious" if triggered_rules else "genuine")
 
         session_time = event.get("SessionTime", "")
         try:

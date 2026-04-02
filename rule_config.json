@@ -1,0 +1,7 @@
+{
+    "discount_threshold_percent": 20,
+    "refund_amount_threshold": 0,
+    "high_value_threshold": 2000,
+    "bulk_quantity_threshold": 10,
+    "idle_pos_minutes": 30
+}

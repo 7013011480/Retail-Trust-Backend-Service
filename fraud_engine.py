@@ -14,6 +14,24 @@ POS_DATA_FILE = "pos_data.json"
 VAS_DATA_FILE = "vas_data.json"
 SALES_DATA_FILE = "pos_event.json"
 VAS_EVENTS_FILE = "vas_event.json"
+RULE_CONFIG_FILE = "rule_config.json"
+
+def load_rule_config() -> dict:
+    """Load configurable rule thresholds."""
+    defaults = {
+        "discount_threshold_percent": 20,
+        "refund_amount_threshold": 0,
+        "high_value_threshold": 2000,
+        "bulk_quantity_threshold": 10,
+        "idle_pos_minutes": 30
+    }
+    try:
+        if os.path.exists(RULE_CONFIG_FILE):
+            with open(RULE_CONFIG_FILE, "r") as f:
+                return {**defaults, **json.load(f)}
+    except Exception:
+        pass
+    return defaults
 
 class FraudEngine:
     def __init__(self, update_callback: Callable, pos_lock: asyncio.Lock):
@@ -169,6 +187,7 @@ class FraudEngine:
         """
         Validates the pair, sends to dashboard, and moves data to processed files.
         """
+        config = load_rule_config()
         triggered_rules = []
         risk_level = "Low"
 
@@ -183,25 +202,43 @@ class FraudEngine:
         if not vas.ReceiptGenerationStatus:
             triggered_rules.append("Bill not generated in VAS")
 
-        # Rule 3: High Discount
-        if pos.DiscountPercent > 20:
+        # Rule 3: High Discount (configurable)
+        if pos.DiscountPercent > config["discount_threshold_percent"]:
             triggered_rules.append(f"High Discount ({pos.DiscountPercent}%)")
 
-        # Rule 4: Refund
-        if pos.RefundAmount > 0:
+        # Rule 4: Refund (configurable threshold)
+        if pos.RefundAmount > config["refund_amount_threshold"]:
             triggered_rules.append(f"Refund Processed (Rs.{pos.RefundAmount})")
 
         # Rule 5: Complementary order
         if hasattr(pos, 'IsComplementary') and pos.IsComplementary == "Yes":
             triggered_rules.append("Complementary Order")
 
+        # Rule 6: Void/Cancelled transaction
+        if hasattr(pos, 'VoidReason') and pos.VoidReason:
+            triggered_rules.append(f"Void Transaction ({pos.VoidReason})")
+        if hasattr(pos, 'CancelDate') and pos.CancelDate:
+            triggered_rules.append("Cancelled Transaction")
+
+        # Rule 7: Negative amount
+        if pos.TransactionTotal < 0:
+            triggered_rules.append(f"Negative Amount (Rs.{pos.TransactionTotal})")
+
+        # Rule 8: High value transaction (configurable)
+        if pos.TransactionTotal > config["high_value_threshold"]:
+            triggered_rules.append(f"High Value Transaction (Rs.{pos.TransactionTotal})")
+
+        # Rule 9: Bulk purchase (configurable)
+        if hasattr(pos, 'ItemCount') and pos.ItemCount > config["bulk_quantity_threshold"]:
+            triggered_rules.append(f"Bulk Purchase ({pos.ItemCount} items)")
+
         # Determine Risk
-        if any("Mismatch" in r for r in triggered_rules):
+        if any(r for r in triggered_rules if "Mismatch" in r or "Void" in r or "Cancelled" in r or "Negative" in r):
             risk_level = "High"
-        elif any("Bill not generated" in r for r in triggered_rules): 
+        elif any("Bill not generated" in r for r in triggered_rules):
             risk_level = "Medium"
         elif triggered_rules:
-             risk_level = "Medium"
+            risk_level = "Medium"
 
         status = TransactionStatus.GENUINE
         if risk_level == "High": status = TransactionStatus.FRAUDULENT
