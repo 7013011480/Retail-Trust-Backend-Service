@@ -49,7 +49,7 @@ manager = ConnectionManager()
 # Persistence files
 TRANSACTIONS_FILE = "transactions.jsonl"
 ALERTS_FILE = "alerts.jsonl"
-BILLS_RAW_FILE = BILLS_RAW_FILE
+BILLS_RAW_FILE = "bills_raw.jsonl"
 
 import threading
 _jsonl_lock = threading.Lock()
