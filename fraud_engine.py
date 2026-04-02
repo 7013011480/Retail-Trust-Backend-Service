@@ -2,7 +2,9 @@ import asyncio
 import json
 import os
 import uuid
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
+
+IST = timezone(timedelta(hours=5, minutes=30))
 from typing import Dict, Optional, List, Callable
 from models import VASEvent, POSEvent, Transaction, Alert, TransactionStatus, AlertStatus #, TransactionMode
 # from utils import acquire_file_lock
@@ -213,7 +215,7 @@ class FraudEngine:
             cam_id=vas.CamId,
             pos_id=pos.POSId,
             cashier_name=pos.CashierName,
-            timestamp=datetime.strptime(pos.SessionTime, "%Y-%m-%d %H:%M:%S"),
+            timestamp=datetime.strptime(pos.SessionTime, "%Y-%m-%d %H:%M:%S").replace(tzinfo=IST),
             transaction_total=pos.TransactionTotal,
             risk_level=risk_level,
             triggered_rules=triggered_rules,
@@ -246,7 +248,7 @@ class FraudEngine:
             vas = event_obj
             pos = None
             t_id = f"TXN-{vas.SessionId}-MISSING"
-            timestamp = datetime.strptime(vas.SessionEnd, "%Y-%m-%d %H:%M:%S")
+            timestamp = datetime.strptime(vas.SessionEnd, "%Y-%m-%d %H:%M:%S").replace(tzinfo=IST)
             shop_id = vas.StoreId
             cam_id = vas.CamId
             pos_id = "Unknown"
@@ -260,7 +262,7 @@ class FraudEngine:
                        # Or we create a dummy VAS? Or just handle None in alert creation?
             
             t_id = f"TXN-POS-{pos.POSId}-MISSING"
-            timestamp = datetime.strptime(pos.SessionTime, "%Y-%m-%d %H:%M:%S")
+            timestamp = datetime.strptime(pos.SessionTime, "%Y-%m-%d %H:%M:%S").replace(tzinfo=IST)
             shop_id = pos.StoreId
             cam_id = "Unknown"
             pos_id = pos.POSId
@@ -304,7 +306,7 @@ class FraudEngine:
         
         shop_id = vas.StoreId if vas else (pos.StoreId if pos else "Unknown")
         cashier = pos.CashierName if pos else "Unknown"
-        ts = datetime.strptime(vas.SessionEnd, "%Y-%m-%d %H:%M:%S") if vas else (datetime.strptime(pos.SessionTime, "%Y-%m-%d %H:%M:%S") if pos else datetime.now())
+        ts = datetime.strptime(vas.SessionEnd, "%Y-%m-%d %H:%M:%S").replace(tzinfo=IST) if vas else (datetime.strptime(pos.SessionTime, "%Y-%m-%d %H:%M:%S").replace(tzinfo=IST) if pos else datetime.now())
         
         alert = Alert(
             id=f"ALT-{uuid.uuid4().hex[:6].upper()}",
