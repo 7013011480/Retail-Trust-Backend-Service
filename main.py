@@ -216,6 +216,9 @@ async def get_historical_data(days: int = 10):
         })
         bills_map[txn_id] = bill
 
+    # Sort latest first
+    transactions.sort(key=lambda t: t["timestamp"], reverse=True)
+
     return {
         "transactions": transactions,
         "bills_map": bills_map
